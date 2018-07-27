@@ -1,4 +1,5 @@
 import * as consts from "./consts";
+import { VALUE_CHANGED } from "../List/consts";
 
 export const defaultState = {
   inFocus: false,
@@ -18,7 +19,7 @@ const reducer = (state = { ...defaultState }, action) => {
         query
       };
 
-    case consts.UPDATE_VALUE:
+    case VALUE_CHANGED:
       return {
         ...state,
         value,

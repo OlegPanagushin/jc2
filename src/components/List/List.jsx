@@ -6,7 +6,7 @@ import theme from "../../theme";
 import Spinner from "../Spinner";
 import ListItem from "../ListItem";
 import ListLabel from "../ListLabel";
-import { valueChange, loadItems, highlight } from "./actions";
+import { valueChange, loadItems, highlight, select } from "./actions";
 
 const styles = {
   list: {
@@ -24,21 +24,12 @@ class List extends React.Component {
     handleChange: PropTypes.func
   };
 
-  onItemClick = newValue => {
-    const prevValue = this.props.value;
-
-    if (!prevValue || prevValue.key !== newValue.key) {
-      this.props.valueChange(newValue);
-      if (this.props.handleChange) this.props.handleChange(newValue, prevValue);
-    }
-  };
-
   renderItem = (item, idx) =>
     isKeyValueObject(item) ? (
       <ListItem
         key={`${idx}-${item.key}`}
         value={item}
-        onClick={item.isErroItem ? this.props.loadItems : this.onItemClick}
+        onClick={item.isErroItem ? this.props.loadItems : this.props.select}
         onHover={() => this.props.highlight(idx)}
         highlight={idx === this.props.highlightIdx}
       >
@@ -84,5 +75,5 @@ export default connect(
   state => ({
     ...state.listReducer
   }),
-  { valueChange, loadItems, highlight }
+  { valueChange, loadItems, highlight, select }
 )(injectSheet(styles)(List));

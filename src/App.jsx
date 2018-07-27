@@ -56,14 +56,14 @@ class App extends React.Component {
     return (
       <div className="App">
         <h2>Пример работы контроля ComboBox</h2>
-        <h3>Со стрелкой</h3>
+        <h3>Выпадающий список</h3>
         <ComboBox
           getItems={getItems}
           handleChange={this.onValueChanged}
           value={value}
           name="cb1"
         />
-        <h3>Без стрелки</h3>
+        <h3>Автокомплит</h3>
         <ComboBox
           autocomplete
           getItems={getItems}

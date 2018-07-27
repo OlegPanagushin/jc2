@@ -13,8 +13,8 @@ import Popover from "../Popover";
 import List from "../List";
 import listReducer from "../List/reducer";
 import { moveUp, moveDown } from "../List/actions";
-import { blur, focus, closePopover, updateValue } from "./actions";
-import { loadItems, updateQuery } from "../List/actions";
+import { blur, focus, closePopover } from "./actions";
+import { loadItems, updateQuery, select } from "../List/actions";
 import reducer, { defaultState } from "./reducer";
 import { defaultState as listReducerDefaultState } from "../List/reducer";
 import styles from "./styles";
@@ -59,7 +59,6 @@ class CustomComboBox extends React.Component {
   handleClickOutside = () => this.props.blur();
 
   handleValueChanged = (newValue, prevValue) => {
-    this.props.updateValue(newValue);
     if (this.props.handleChange) this.props.handleChange(newValue, prevValue);
   };
 
@@ -79,6 +78,7 @@ class CustomComboBox extends React.Component {
         this.props.moveDown();
         break;
       case "Enter":
+        this.props.select();
         break;
       default:
         break;
@@ -142,8 +142,8 @@ const StyledComboBox = connect(
     blur,
     focus,
     closePopover,
-    updateValue,
-    loadItems
+    loadItems,
+    select
   }
 )(injectSheet(styles)(onClickOutside(CustomComboBox)));
 

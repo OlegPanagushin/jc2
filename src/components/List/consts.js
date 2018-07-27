@@ -8,3 +8,4 @@ export const MOVE_UP = "MOVE_UP";
 export const MOVE_DOWN = "MOVE_DOWN";
 export const VALUE_CHANGED = "VALUE_CHANGED";
 export const HIGHLIGHT = "HIGHLIGHT";
+export const SELECT = "SELECT";

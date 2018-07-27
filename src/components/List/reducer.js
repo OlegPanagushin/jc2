@@ -70,6 +70,12 @@ const reducer = (state = { ...defaultState }, action) => {
         value
       };
 
+    case consts.SELECT:
+      return {
+        ...state,
+        value: state.items[state.highlightIdx]
+      };
+
     default:
       return state;
   }
