@@ -66,20 +66,35 @@ export const updateQuery = query => (dispatch, getState) => {
   loadItems()(dispatch, getState);
 };
 
-const debouncedLoadItems = debounce((dispatch, query, getItems) => {
-  getItems(query)
-    .then(items => {
-      dispatch({
-        type: consts.LOAD_ITEMS_SUCCESS,
-        items
-      });
-    })
-    .catch(error => dispatch({ type: consts.LOAD_ITEMS_FAIL, error }));
-}, 300);
+const debouncedLoadItems = debounce(
+  (dispatch, query, getItems, value, highlightSelected) => {
+    getItems(query)
+      .then(items => {
+        dispatch({
+          type: consts.LOAD_ITEMS_SUCCESS,
+          items
+        });
+        if (highlightSelected) {
+          if (!value) dispatch({ type: consts.HIGHLIGHT, highlightIdx: 0 });
+          else {
+            for (let i = 0; i < items.length; i++) {
+              if (items[i].key === value.key) {
+                dispatch({ type: consts.HIGHLIGHT, highlightIdx: i });
+                return;
+              }
+            }
+            dispatch({ type: consts.HIGHLIGHT, highlightIdx: 0 });
+          }
+        }
+      })
+      .catch(error => dispatch({ type: consts.LOAD_ITEMS_FAIL, error }));
+  },
+  300
+);
 
-export const loadItems = () => (dispatch, getState) => {
+export const loadItems = highlightSelected => (dispatch, getState) => {
   const state = getState();
-  const { query, getItems } = state.list;
+  const { query, getItems, value } = state.list;
   dispatch({ type: consts.LOAD_ITEMS_REQUEST });
-  debouncedLoadItems(dispatch, query, getItems);
+  debouncedLoadItems(dispatch, query, getItems, value, highlightSelected);
 };

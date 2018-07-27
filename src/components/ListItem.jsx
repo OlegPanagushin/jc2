@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import injectSheet from "react-jss";
 import cn from "classnames";
+import scrollIntoView from "scroll-into-view-if-needed";
 import theme from "../theme";
 
 const styles = {
@@ -27,9 +28,20 @@ class ListItem extends React.Component {
     highlight: PropTypes.bool
   };
 
+  itemRef = React.createRef();
+
   onClick = () => this.props.onClick && this.props.onClick();
 
   onMouseEnter = () => this.props.onHover && this.props.onHover();
+
+  componentDidUpdate(prevProps) {
+    if (this.props.highlight !== prevProps.highlight) {
+      scrollIntoView(this.itemRef.current, {
+        scrollMode: "if-needed",
+        block: "top"
+      });
+    }
+  }
 
   render() {
     const { classes, children, highlight } = this.props;
@@ -39,6 +51,7 @@ class ListItem extends React.Component {
         className={cn(classes.listItem, highlight && classes.highlight)}
         onClick={this.onClick}
         onMouseEnter={this.onMouseEnter}
+        ref={this.itemRef}
       >
         {children}
       </div>

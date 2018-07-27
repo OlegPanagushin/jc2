@@ -14,7 +14,7 @@ import List from "../List";
 import listReducer from "../List/reducer";
 import { moveUp, moveDown } from "../List/actions";
 import { blur, focus, closePopover, validationError } from "./actions";
-import { loadItems, updateQuery, select } from "../List/actions";
+import { loadItems, updateQuery, select, highlight } from "../List/actions";
 import reducer, { defaultState } from "./reducer";
 import { defaultState as listReducerDefaultState } from "../List/reducer";
 import styles from "./styles";
@@ -47,7 +47,7 @@ class CustomComboBox extends React.Component {
   handleFocus = () => {
     const { autocomplete } = this.props;
     this.props.focus(autocomplete);
-    if (!autocomplete) this.props.loadItems();
+    if (!autocomplete) this.props.loadItems(true);
   };
 
   handleInputChange = e => this.props.updateQuery(e.target.value);
@@ -172,7 +172,8 @@ const StyledComboBox = connect(
     closePopover,
     loadItems,
     select,
-    validationError
+    validationError,
+    highlight
   }
 )(injectSheet(styles)(onClickOutside(CustomComboBox)));
 
