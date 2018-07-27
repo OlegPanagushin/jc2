@@ -1,19 +1,39 @@
 import * as consts from "./consts";
 
-const defaultState = {
+export const defaultState = {
   items: [],
   highlightIdx: 0,
-  selected: -1
+  value: null,
+  query: "",
+  loading: false,
+  error: false
 };
 
 const reducer = (state = { ...defaultState }, action) => {
-  const { type, items = [], highlightIdx, selectIdx } = action;
+  const { type, items = [], highlightIdx, value, query } = action;
 
   switch (type) {
-    case consts.GOT_ITEMS:
+    case consts.LOAD_ITEMS_REQUEST:
       return {
         ...state,
-        items
+        loading: true,
+        error: false
+      };
+
+    case consts.LOAD_ITEMS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        items,
+        highlightIdx: 0
+      };
+
+    case consts.LOAD_ITEMS_FAIL:
+      return {
+        ...state,
+        loading: false,
+        error: true,
+        highlightIdx: 1
       };
 
     case consts.MOVE_UP: {
@@ -38,10 +58,16 @@ const reducer = (state = { ...defaultState }, action) => {
         highlightIdx
       };
 
-    case consts.SELECT:
+    case consts.QUERY_CHANGED:
       return {
         ...state,
-        selected: selectIdx
+        query
+      };
+
+    case consts.VALUE_CHANGED:
+      return {
+        ...state,
+        value
       };
 
     default:

@@ -31,31 +31,18 @@ class ListItem extends React.Component {
     highlight: PropTypes.bool
   };
 
-  constructor(props) {
-    super(props);
-    this.state = { highlight: props.highlight };
-  }
-
   onClick = () => this.props.onClick && this.props.onClick(this.props.value);
 
-  onMouseEnter = () => this.setState({ highlight: true });
-  onMouseLeave = () => this.setState({ highlight: false });
-
-  componentDidUpdate(prevProps) {
-    const { highlight } = this.props;
-    if (prevProps.highlight !== highlight) this.setState({ highlight });
-  }
+  onMouseEnter = () => this.props.onHover && this.props.onHover();
 
   render() {
-    const { classes, children } = this.props;
-    const { highlight } = this.state;
+    const { classes, children, highlight } = this.props;
 
     return (
       <div
         className={cn(classes.listItem, highlight && classes.highlight)}
         onClick={this.onClick}
         onMouseEnter={this.onMouseEnter}
-        onMouseLeave={this.onMouseLeave}
       >
         {children}
       </div>

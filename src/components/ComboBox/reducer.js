@@ -1,61 +1,36 @@
 import * as consts from "./consts";
 
 export const defaultState = {
-  error: false,
   inFocus: false,
-  loading: false,
   showPopover: false,
-  query: null,
-  label: "",
-  lastQuery: null,
+  query: "",
   value: null
 };
 
 const reducer = (state = { ...defaultState }, action) => {
-  const { type, query, value } = action;
+  const { type, value, isAutocomplete, query } = action;
 
   switch (type) {
-    case consts.LOAD_ITEMS_REQUEST:
-      return {
-        ...state,
-        loading: true,
-        error: false
-      };
-
-    case consts.LOAD_ITEMS_SUCCESS:
-      return {
-        ...state,
-        loading: false
-      };
-
-    case consts.LOAD_ITEMS_FAIL:
-      return {
-        ...state,
-        loading: false,
-        error: true
-      };
-
     case consts.QUERY_CHANGED:
       return {
         ...state,
-        query,
-        label: query
+        showPopover: true,
+        query
       };
 
-    case consts.VALUE_CHANGED:
+    case consts.UPDATE_VALUE:
       return {
         ...state,
         value,
-        query: "",
-        showPopover: false,
-        label: value ? value.value : ""
+        query: value ? value.value : "",
+        showPopover: false
       };
 
     case consts.FOCUS:
       return {
         ...state,
         inFocus: true,
-        showPopover: true
+        showPopover: !isAutocomplete
       };
 
     case consts.BLUR:

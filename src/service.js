@@ -8,11 +8,13 @@ const popularCities = [
   data[random(0, data.length - 1)]
 ];
 
-export const randomDelay = () =>
+let randomDelay = () =>
   new Promise(resolve => setTimeout(resolve, random(200, 800)));
 
 export async function find(query, take = 5, page = 0) {
   await randomDelay();
+
+  if (random(0, 30) > 20) throw Error("Something went wrong");
 
   if (typeof query === "string") {
     const result = data.filter(v =>

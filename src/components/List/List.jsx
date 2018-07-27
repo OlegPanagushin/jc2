@@ -1,10 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
 import injectSheet from "react-jss";
-import { connect } from "react-redux";
+import { connectComboBox as connect } from "../../redux";
+import theme from "../../theme";
+import Spinner from "../Spinner";
 import ListItem from "../ListItem";
 import ListLabel from "../ListLabel";
-import theme from "../../theme";
+import { valueChange, loadItems, highlight } from "./actions";
 
 const styles = {
   list: {
@@ -22,17 +24,13 @@ class List extends React.Component {
     handleChange: PropTypes.func
   };
 
-  state = { value: null, highlightedIdx: 0 };
-
   onItemClick = newValue => {
-    const prevValue = this.state.value;
-    this.setState({ value: newValue });
+    const prevValue = this.props.value;
 
-    if (
-      this.props.handleChange &&
-      (!prevValue || prevValue.key !== newValue.key)
-    )
-      this.props.handleChange(newValue, prevValue);
+    if (!prevValue || prevValue.key !== newValue.key) {
+      this.props.valueChange(newValue);
+      if (this.props.handleChange) this.props.handleChange(newValue, prevValue);
+    }
   };
 
   renderItem = (item, idx) =>
@@ -40,7 +38,8 @@ class List extends React.Component {
       <ListItem
         key={`${idx}-${item.key}`}
         value={item}
-        onClick={this.onItemClick}
+        onClick={item.isErroItem ? this.props.loadItems : this.onItemClick}
+        onHover={() => this.props.highlight(idx)}
         highlight={idx === this.props.highlightIdx}
       >
         {item.value}
@@ -50,26 +49,40 @@ class List extends React.Component {
     );
 
   renderItems = items =>
-    Array.isArray(items) ? (
-      items.length ? (
-        items.map(this.renderItem)
-      ) : (
-        <ListLabel>На найдено</ListLabel>
-      )
+    items.length ? (
+      items.map(this.renderItem)
     ) : (
-      this.renderItem(items, 0)
+      <ListLabel>На найдено</ListLabel>
     );
 
-  render() {
-    const { classes, items } = this.props;
+  renderError = () =>
+    [
+      <ListLabel key="label">
+        Что-то пошло не так, попробуйте еще раз
+      </ListLabel>,
+      { key: -1, value: "Обновить", isErroItem: true }
+    ].map(this.renderItem);
 
-    return <div className={classes.list}>{this.renderItems(items)}</div>;
+  render() {
+    const { classes, items, error, loading } = this.props;
+
+    return (
+      <div className={classes.list}>
+        {loading ? (
+          <Spinner />
+        ) : error ? (
+          this.renderError()
+        ) : (
+          this.renderItems(items)
+        )}
+      </div>
+    );
   }
 }
 
-export default connect(state => {
-  return {
-    highlightIdx: state.listReducer.highlightIdx,
-    items: state.listReducer.items
-  };
-})(injectSheet(styles)(List));
+export default connect(
+  state => ({
+    ...state.listReducer
+  }),
+  { valueChange, loadItems, highlight }
+)(injectSheet(styles)(List));

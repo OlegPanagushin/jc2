@@ -13,6 +13,9 @@ const styles = {
   }
 };
 
+// const placeholderWithArrow = "Введите или выберите из списка";
+// const placeholderWithoutArrow = "Начните вводить код или название";
+
 let mapCity = ({ Id, City }) => ({
   key: Id,
   value: City

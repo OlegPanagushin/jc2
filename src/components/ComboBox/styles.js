@@ -43,11 +43,17 @@ export default {
     }
   },
   arrow: {
-    background: theme.placeholderColor,
     cursor: "pointer",
     width: arrowWidth,
     fallbacks: {
       display: "table-cell"
     }
+  },
+  arrowSvg: {
+    display: "block",
+    fill: theme.placeholderColor,
+    height: "100%",
+    margin: [[0, "auto"]],
+    width: theme.spacingUnit * 2
   }
 };
