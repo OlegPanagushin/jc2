@@ -37,17 +37,25 @@ export const moveDown = () => (dispatch, getState) => {
   dispatch(highlight(newIndex));
 };
 
-export const valueChange = value => ({ type: consts.VALUE_CHANGED, value });
+export const valueChange = value => (dispatch, getState) => {
+  dispatch({ type: consts.VALUE_CHANGED, value });
+  const state = getState();
+  const { onChange } = state.list;
+  if (onChange) onChange(value);
+};
 
-export const select = () => (dispatch, getState) => {
+export const select = success => (dispatch, getState) => {
   const state = getState();
   const { items, highlightIdx, loading, error } = state.list;
+
   if (loading) return;
+
   if (error) dispatch(loadItems(dispatch, getState));
   else if (!items.length) return;
   else {
     const newValue = items[highlightIdx];
-    dispatch(valueChange(newValue));
+    valueChange(newValue)(dispatch, getState);
+    if (success) success();
   }
 };
 

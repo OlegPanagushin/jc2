@@ -26,7 +26,6 @@ class List extends React.Component {
     isKeyValueObject(item) ? (
       <ListItem
         key={`${idx}-${item.key}`}
-        value={item}
         onClick={item.isErroItem ? this.props.loadItems : this.props.select}
         onHover={() => this.props.highlight(idx)}
         highlight={idx === this.props.highlightIdx}

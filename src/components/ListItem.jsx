@@ -24,14 +24,10 @@ class ListItem extends React.Component {
     classes: PropTypes.object.isRequired,
     children: PropTypes.node.isRequired,
     onClick: PropTypes.func,
-    value: PropTypes.shape({
-      key: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-      value: PropTypes.string.isRequired
-    }).isRequired,
     highlight: PropTypes.bool
   };
 
-  onClick = () => this.props.onClick && this.props.onClick(this.props.value);
+  onClick = () => this.props.onClick && this.props.onClick();
 
   onMouseEnter = () => this.props.onHover && this.props.onHover();
 

@@ -50,20 +50,34 @@ class CustomComboBox extends React.Component {
     if (!autocomplete) this.props.loadItems();
   };
 
-  handleInputChange = e => {
-    this.props.updateQuery(e.target.value);
-  };
+  handleInputChange = e => this.props.updateQuery(e.target.value);
 
   handleArrowClick = () => this.inputRef.current.focus(this.props.autocomplete);
 
   handleClickOutside = () => this.props.blur();
 
-  handleValueChanged = newValue => {
-    if (this.props.handleChange) this.props.handleChange(newValue);
+  focusNext = () => {
+    const current = this.inputRef.current;
+    const all = document.querySelectorAll(
+      "input, button, a, area, object, select, textarea"
+    );
+
+    if (all.length) {
+      let currentIdx;
+      for (let i = 0; i < all.length; i++) {
+        if (current.isEqualNode(all[i])) {
+          currentIdx = i;
+        }
+      }
+
+      const nextIdx = currentIdx + 1;
+      if (nextIdx < all.length) all[nextIdx].focus();
+      else all[0].focus();
+    }
+    this.props.blur();
   };
 
   handleKeyDown = e => {
-    //console.log(e.key);
     switch (e.key) {
       case "Tab":
         this.props.blur();
@@ -78,7 +92,7 @@ class CustomComboBox extends React.Component {
         this.props.moveDown();
         break;
       case "Enter":
-        this.props.select();
+        this.props.select(this.focusNext);
         break;
       default:
         break;
@@ -93,8 +107,7 @@ class CustomComboBox extends React.Component {
 
       query,
       inFocus,
-      showPopover,
-      error
+      showPopover
     } = this.props;
 
     return (
@@ -126,7 +139,7 @@ class CustomComboBox extends React.Component {
           </div>
         )}
         <Popover open={showPopover}>
-          <List handleChange={this.handleValueChanged} error={error} />
+          <List />
         </Popover>
       </div>
     );
@@ -154,7 +167,8 @@ export default class ComboBox extends React.Component {
       combo: { ...defaultState },
       list: {
         ...listReducerDefaultState,
-        getItems: props.getItems
+        getItems: props.getItems,
+        onChange: props.onChange
       }
     });
   }

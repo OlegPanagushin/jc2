@@ -59,7 +59,7 @@ class App extends React.Component {
         <h3>Выпадающий список</h3>
         <ComboBox
           getItems={getItems}
-          handleChange={this.onValueChanged}
+          onChange={this.onValueChanged}
           value={value}
           name="cb1"
         />
@@ -67,7 +67,7 @@ class App extends React.Component {
         <ComboBox
           autocomplete
           getItems={getItems}
-          handleChange={this.onValueChanged}
+          onChange={this.onValueChanged}
           value={value}
           name="cb2"
         />
