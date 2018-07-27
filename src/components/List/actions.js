@@ -44,15 +44,17 @@ export const valueChange = value => (dispatch, getState) => {
   if (onChange) onChange(value);
 };
 
-export const select = success => (dispatch, getState) => {
+export const select = (success, fail) => (dispatch, getState) => {
   const state = getState();
   const { items, highlightIdx, loading, error } = state.list;
 
   if (loading) return;
 
   if (error) dispatch(loadItems(dispatch, getState));
-  else if (!items.length) return;
-  else {
+  else if (!items.length) {
+    if (fail) fail();
+    return;
+  } else {
     const newValue = items[highlightIdx];
     valueChange(newValue)(dispatch, getState);
     if (success) success();

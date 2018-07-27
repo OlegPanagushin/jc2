@@ -1,6 +1,6 @@
 import React from "react";
 import injectSheet from "react-jss";
-import { find, popular } from "./service";
+import { find, popular, findFrom50 } from "./service";
 import ComboBox from "./components/ComboBox";
 import ListLabel from "./components/ListLabel";
 import Separator from "./components/Separator";
@@ -12,9 +12,6 @@ const styles = {
     }
   }
 };
-
-// const placeholderWithArrow = "Введите или выберите из списка";
-// const placeholderWithoutArrow = "Начните вводить код или название";
 
 let mapCity = ({ Id, City }) => ({
   key: Id,
@@ -30,7 +27,7 @@ let renderTotalCount = (foundCount, totalCount) =>
     []
   );
 
-let getItems = async query => {
+const getAutocompleteItems = async query => {
   const { data, totalCount } = await find(query),
     items = data.map(mapCity),
     popularItems = query.length ? [] : await popular();
@@ -41,6 +38,11 @@ let getItems = async query => {
     items,
     renderTotalCount(items.length, totalCount)
   );
+};
+
+const getDropDownItems = async query => {
+  const data = await findFrom50(query);
+  return data.map(mapCity);
 };
 
 class App extends React.Component {
@@ -58,17 +60,15 @@ class App extends React.Component {
         <h2>Пример работы контроля ComboBox</h2>
         <h3>Выпадающий список</h3>
         <ComboBox
-          getItems={getItems}
+          getItems={getDropDownItems}
           onChange={this.onValueChanged}
-          value={value}
           name="cb1"
         />
         <h3>Автокомплит</h3>
         <ComboBox
           autocomplete
-          getItems={getItems}
+          getItems={getAutocompleteItems}
           onChange={this.onValueChanged}
-          value={value}
           name="cb2"
         />
         <br />

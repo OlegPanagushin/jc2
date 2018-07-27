@@ -5,7 +5,8 @@ export const defaultState = {
   inFocus: false,
   showPopover: false,
   query: "",
-  value: null
+  value: null,
+  error: false
 };
 
 const reducer = (state = { ...defaultState }, action) => {
@@ -16,6 +17,7 @@ const reducer = (state = { ...defaultState }, action) => {
       return {
         ...state,
         showPopover: true,
+        error: false,
         query
       };
 
@@ -31,6 +33,7 @@ const reducer = (state = { ...defaultState }, action) => {
       return {
         ...state,
         inFocus: true,
+        error: false,
         showPopover: !isAutocomplete
       };
 
@@ -45,6 +48,12 @@ const reducer = (state = { ...defaultState }, action) => {
       return {
         ...state,
         showPopover: false
+      };
+
+    case consts.ERROR:
+      return {
+        ...state,
+        error: true
       };
 
     default:

@@ -15,6 +15,7 @@ export default {
   lineHeight: "20px",
   placeholderColor: placeholderColor,
   placeholderLighterColor: lighten(0.1, placeholderColor),
+  redColor: "red",
   spacingUnit: 8,
   textColor: color,
   zPopover: 100,

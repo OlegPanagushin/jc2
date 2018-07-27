@@ -29,3 +29,13 @@ export async function popular() {
   await randomDelay();
   return popularCities;
 }
+
+export async function findFrom50(query) {
+  let source = data.slice(0, 50);
+  if (typeof query === "string") {
+    return source.filter(v =>
+      v.City.toLowerCase().includes(query.toString().toLowerCase())
+    );
+  } else if (!query) return source;
+  else throw Error("Wrong query");
+}

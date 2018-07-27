@@ -11,6 +11,7 @@ import { isKeyValueObject } from "../../utils";
 
 const styles = {
   list: {
+    maxHeight: props => props.maxHeight,
     padding: [[theme.spacingUnit, 0]]
   }
 };

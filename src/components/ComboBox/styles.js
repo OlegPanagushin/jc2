@@ -15,6 +15,9 @@ export default {
       display: "table"
     }
   },
+  error: {
+    borderColor: theme.redColor
+  },
   input: {
     border: "none",
     color: theme.textColor,
@@ -55,5 +58,13 @@ export default {
     height: "100%",
     margin: [[0, "auto"]],
     width: theme.spacingUnit * 2
+  },
+  errorLabel: {
+    color: theme.redColor,
+    display: "block",
+    fontFamily: theme.fontFamily,
+    fontSize: theme.fontSize,
+    lineHeight: theme.lineHeight,
+    padding: [[theme.spacingUnit / 2, theme.spacingUnit]]
   }
 };

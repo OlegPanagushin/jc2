@@ -13,7 +13,7 @@ import Popover from "../Popover";
 import List from "../List";
 import listReducer from "../List/reducer";
 import { moveUp, moveDown } from "../List/actions";
-import { blur, focus, closePopover } from "./actions";
+import { blur, focus, closePopover, validationError } from "./actions";
 import { loadItems, updateQuery, select } from "../List/actions";
 import reducer, { defaultState } from "./reducer";
 import { defaultState as listReducerDefaultState } from "../List/reducer";
@@ -77,10 +77,13 @@ class CustomComboBox extends React.Component {
     this.props.blur();
   };
 
+  notFound = () => this.props.query.length && this.props.validationError();
+
   handleKeyDown = e => {
     switch (e.key) {
       case "Tab":
         this.props.blur();
+        this.props.select(null, this.notFound);
         break;
       case "Escape":
         this.props.closePopover();
@@ -92,7 +95,7 @@ class CustomComboBox extends React.Component {
         this.props.moveDown();
         break;
       case "Enter":
-        this.props.select(this.focusNext);
+        this.props.select(this.focusNext, this.notFound);
         break;
       default:
         break;
@@ -105,42 +108,54 @@ class CustomComboBox extends React.Component {
       autocomplete,
       name,
 
+      error,
       query,
       inFocus,
       showPopover
     } = this.props;
 
     return (
-      <div className={cn(classes.comboBox, inFocus && classes.inFocus)}>
-        <input
-          ref={this.inputRef}
-          className={classes.input}
-          type="text"
-          placeholder={
-            autocomplete ? placeholderWithoutArrow : placeholderWithArrow
-          }
-          onFocus={this.handleFocus}
-          onChange={this.handleInputChange}
-          onKeyDown={this.handleKeyDown}
-          value={query}
-          name={name}
-        />
-        {!autocomplete && (
-          <div className={classes.arrow} onClick={this.handleArrowClick}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 960 560"
-              className={classes.arrowSvg}
-            >
-              <g>
-                <path d="M480,344.181L268.869,131.889c-15.756-15.859-41.3-15.859-57.054,0c-15.754,15.857-15.754,41.57,0,57.431l237.632,238.937 c8.395,8.451,19.562,12.254,30.553,11.698c10.993,0.556,22.159-3.247,30.555-11.698l237.631-238.937 c15.756-15.86,15.756-41.571,0-57.431s-41.299-15.859-57.051,0L480,344.181z" />
-              </g>
-            </svg>
-          </div>
+      <div>
+        <div
+          className={cn(
+            classes.comboBox,
+            inFocus && classes.inFocus,
+            error && classes.error
+          )}
+        >
+          <input
+            ref={this.inputRef}
+            className={classes.input}
+            type="text"
+            placeholder={
+              autocomplete ? placeholderWithoutArrow : placeholderWithArrow
+            }
+            onFocus={this.handleFocus}
+            onChange={this.handleInputChange}
+            onKeyDown={this.handleKeyDown}
+            value={query}
+            name={name}
+          />
+          {!autocomplete && (
+            <div className={classes.arrow} onClick={this.handleArrowClick}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 960 560"
+                className={classes.arrowSvg}
+              >
+                <g>
+                  <path d="M480,344.181L268.869,131.889c-15.756-15.859-41.3-15.859-57.054,0c-15.754,15.857-15.754,41.57,0,57.431l237.632,238.937 c8.395,8.451,19.562,12.254,30.553,11.698c10.993,0.556,22.159-3.247,30.555-11.698l237.631-238.937 c15.756-15.86,15.756-41.571,0-57.431s-41.299-15.859-57.051,0L480,344.181z" />
+                </g>
+              </svg>
+            </div>
+          )}
+          <Popover open={showPopover}>
+            <List maxHeight={autocomplete ? "auto" : 300} />
+          </Popover>
+        </div>
+        {error && (
+          <label className={classes.errorLabel}>Выберите значение</label>
         )}
-        <Popover open={showPopover}>
-          <List />
-        </Popover>
       </div>
     );
   }
@@ -156,7 +171,8 @@ const StyledComboBox = connect(
     focus,
     closePopover,
     loadItems,
-    select
+    select,
+    validationError
   }
 )(injectSheet(styles)(onClickOutside(CustomComboBox)));
 

@@ -27,7 +27,7 @@ class Spinner extends React.Component {
         height={height || 20}
         viewBox="0 0 38 38"
         xmlns="http://www.w3.org/2000/svg"
-        stroke="#000"
+        stroke="#999"
       >
         <g fill="none" fillRule="evenodd">
           <g transform="translate(1 1)" strokeWidth="2">
