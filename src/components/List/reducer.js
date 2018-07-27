@@ -36,22 +36,6 @@ const reducer = (state = { ...defaultState }, action) => {
         highlightIdx: 1
       };
 
-    case consts.MOVE_UP: {
-      const nextIdx = state.highlightIdx - 1;
-      return {
-        ...state,
-        highlightIdx: nextIdx < 0 ? state.items.length - 1 : nextIdx
-      };
-    }
-
-    case consts.MOVE_DOWN: {
-      const nextIdx = state.highlightIdx + 1;
-      return {
-        ...state,
-        highlightIdx: nextIdx >= state.items.length ? 0 : nextIdx
-      };
-    }
-
     case consts.HIGHLIGHT:
       return {
         ...state,

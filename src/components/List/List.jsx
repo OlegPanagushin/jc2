@@ -7,15 +7,13 @@ import Spinner from "../Spinner";
 import ListItem from "../ListItem";
 import ListLabel from "../ListLabel";
 import { valueChange, loadItems, highlight, select } from "./actions";
+import { isKeyValueObject } from "../../utils";
 
 const styles = {
   list: {
     padding: [[theme.spacingUnit, 0]]
   }
 };
-
-const isKeyValueObject = item =>
-  typeof item === "object" && "key" in item && "value" in item;
 
 class List extends React.Component {
   static propTypes = {
@@ -73,7 +71,7 @@ class List extends React.Component {
 
 export default connect(
   state => ({
-    ...state.listReducer
+    ...state.list
   }),
   { valueChange, loadItems, highlight, select }
 )(injectSheet(styles)(List));

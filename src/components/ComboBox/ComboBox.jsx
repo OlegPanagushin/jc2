@@ -21,7 +21,7 @@ import styles from "./styles";
 
 const configureStore = initialState =>
   createStore(
-    combineReducers({ reducer, listReducer }),
+    combineReducers({ combo: reducer, list: listReducer }),
     initialState,
     applyMiddleware(thunk)
   );
@@ -58,8 +58,8 @@ class CustomComboBox extends React.Component {
 
   handleClickOutside = () => this.props.blur();
 
-  handleValueChanged = (newValue, prevValue) => {
-    if (this.props.handleChange) this.props.handleChange(newValue, prevValue);
+  handleValueChanged = newValue => {
+    if (this.props.handleChange) this.props.handleChange(newValue);
   };
 
   handleKeyDown = e => {
@@ -134,7 +134,7 @@ class CustomComboBox extends React.Component {
 }
 
 const StyledComboBox = connect(
-  state => ({ ...state.reducer }),
+  state => ({ ...state.combo }),
   {
     moveUp,
     moveDown,
@@ -151,8 +151,8 @@ export default class ComboBox extends React.Component {
   constructor(props) {
     super(props);
     this.store = configureStore({
-      reducer: { ...defaultState },
-      listReducer: {
+      combo: { ...defaultState },
+      list: {
         ...listReducerDefaultState,
         getItems: props.getItems
       }
