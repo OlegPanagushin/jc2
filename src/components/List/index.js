@@ -1,3 +1,3 @@
-export { default } from "./List";
-export { reducer as listReducer } from "./reducer";
-export * from "./actions";
+export { BaseList, StyledList } from "./List";
+export { Item as ListItem } from "./Item";
+export { Label as ListLabel } from "./Label";

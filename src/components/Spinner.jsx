@@ -12,7 +12,9 @@ const styles = {
 
 class Spinner extends React.Component {
   static propTypes = {
-    classes: PropTypes.object.isRequired,
+    classes: PropTypes.shape({
+      spinner: PropTypes.string.isRequired
+    }).isRequired,
     width: PropTypes.number,
     height: PropTypes.number
   };

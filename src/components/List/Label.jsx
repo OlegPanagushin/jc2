@@ -1,10 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
 import injectSheet from "react-jss";
-import theme from "../theme";
+import theme from "../../theme";
 
 const styles = {
-  listLabel: {
+  label: {
     color: theme.placeholderColor,
     fontFamily: theme.fontFamily,
     fontSize: theme.fontSize * 0.8,
@@ -13,13 +13,15 @@ const styles = {
   }
 };
 
-const ListLabel = ({ classes, children }) => (
-  <div className={classes.listLabel}>{children}</div>
+const Label = ({ classes, children }) => (
+  <div className={classes.label}>{children}</div>
 );
 
-ListLabel.propTypes = {
-  classes: PropTypes.object.isRequired,
+Label.propTypes = {
+  classes: PropTypes.shape({
+    label: PropTypes.string.isRequired
+  }).isRequired,
   children: PropTypes.node.isRequired
 };
 
-export default injectSheet(styles)(ListLabel);
+export default injectSheet(styles)(Label);

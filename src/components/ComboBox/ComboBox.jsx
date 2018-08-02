@@ -2,38 +2,75 @@ import React from "react";
 import PropTypes from "prop-types";
 import cn from "classnames";
 import injectSheet from "react-jss";
-import onClickOutside from "react-onclickoutside";
-import { createStore, combineReducers, applyMiddleware } from "redux";
+import { createStore, applyMiddleware } from "redux";
 import thunk from "redux-thunk";
+import { denormalize, schema } from "normalizr";
 import {
-  ComboBoxProvider as Provider,
-  connectComboBox as connect
-} from "../../redux";
-import Popover from "../Popover";
-import List from "../List";
-import listReducer from "../List/reducer";
-import { moveUp, moveDown } from "../List/actions";
-import { blur, focus, closePopover, validationError } from "./actions";
-import { loadItems, updateQuery, select, highlight } from "../List/actions";
-import reducer, { defaultState } from "./reducer";
-import { defaultState as listReducerDefaultState } from "../List/reducer";
+  ComboBoxStoreProvider as Provider,
+  connectToComboBoxProvider as connect
+} from "./redux";
+import reducer from "./reducer";
+import {
+  handleFocus,
+  handleBlur,
+  handleInputChange,
+  selectItem,
+  activateItem,
+  deactivateItem
+  // blur,
+  // focus,
+  // closePopover,
+  // validationError,
+  // moveUp,
+  // moveDown,
+  // loadItems,
+  // updateQuery,
+  // select,
+  // highlight
+} from "./actions";
 import styles from "./styles";
+import Popover from "../Popover";
+import { StyledList } from "../List";
+import { focusNextControl } from "../../utils";
 
 const configureStore = initialState =>
-  createStore(
-    combineReducers({ combo: reducer, list: listReducer }),
-    initialState,
-    applyMiddleware(thunk)
-  );
+  createStore(reducer, initialState, applyMiddleware(thunk));
 
 const placeholderWithArrow = "Введите или выберите из списка";
 const placeholderWithoutArrow = "Начните вводить";
+
+const keyValue = new schema.Entity(
+  "items",
+  {},
+  {
+    idAttribute: "key"
+  }
+);
+const keyValueSchema = [keyValue];
+
+const getItems = normalData => {
+  return normalData
+    ? denormalize(normalData.result, keyValueSchema, normalData.entities)
+    : [];
+};
+
+const ListConnectedToStore = connect(state => {
+  const { items, popularItems, infoText, isError, isLoading } = state;
+  return {
+    items: getItems(items),
+    popularItems: getItems(popularItems),
+    infoText,
+    isError,
+    isLoading
+  };
+})(StyledList);
 
 class CustomComboBox extends React.Component {
   static propTypes = {
     classes: PropTypes.object.isRequired,
     autocomplete: PropTypes.bool,
-    getItems: PropTypes.func.isRequired,
+    loadPopular: PropTypes.func,
+    loadItems: PropTypes.func.isRequired,
     name: PropTypes.string,
     handleChange: PropTypes.func,
     value: PropTypes.shape({
@@ -44,46 +81,26 @@ class CustomComboBox extends React.Component {
 
   inputRef = React.createRef();
 
-  handleFocus = () => {
-    const { autocomplete } = this.props;
-    this.props.focus(autocomplete);
-    if (!autocomplete) this.props.loadItems(true);
-  };
+  handle = name => ({ event, item }) => this.props[name](event, item);
 
-  handleInputChange = e => this.props.updateQuery(e.target.value);
+  onFocus = this.handle("handleFocus");
+  onBlur = this.handle("handleBlur");
+  onInputChange = this.handle("inputChange");
+  handleItemClick = this.handle("handleItemClick");
+  handleMouseEnterItem = this.handle("handleMouseEnterItem");
+  handleMouseLeaveItem = this.handle("handleMouseLeaveItem");
 
-  handleArrowClick = () => this.inputRef.current.focus(this.props.autocomplete);
-
-  handleClickOutside = () => this.props.blur();
+  onArrowClick = () => this.inputRef.current.focus();
 
   focusNext = () => {
-    const current = this.inputRef.current;
-    const all = document.querySelectorAll(
-      "input, button, a, area, object, select, textarea"
-    );
-
-    if (all.length) {
-      let currentIdx;
-      for (let i = 0; i < all.length; i++) {
-        if (current.isEqualNode(all[i])) {
-          currentIdx = i;
-        }
-      }
-
-      const nextIdx = currentIdx + 1;
-      if (nextIdx < all.length) all[nextIdx].focus();
-      else all[0].focus();
-    }
+    focusNextControl(this.inputRef.current);
     this.props.blur();
   };
-
-  notFound = () => this.props.query.length && this.props.validationError();
 
   handleKeyDown = e => {
     switch (e.key) {
       case "Tab":
-        this.props.blur();
-        this.props.select(null, this.notFound);
+        this.props.select(null);
         break;
       case "Escape":
         this.props.closePopover();
@@ -95,7 +112,7 @@ class CustomComboBox extends React.Component {
         this.props.moveDown();
         break;
       case "Enter":
-        this.props.select(this.focusNext, this.notFound);
+        this.props.select(this.focusNext);
         break;
       default:
         break;
@@ -108,10 +125,10 @@ class CustomComboBox extends React.Component {
       autocomplete,
       name,
 
-      error,
-      query,
-      inFocus,
-      showPopover
+      text,
+      isInFocus,
+      isPopoverShown,
+      isValidationError
     } = this.props;
 
     return (
@@ -119,8 +136,8 @@ class CustomComboBox extends React.Component {
         <div
           className={cn(
             classes.comboBox,
-            inFocus && classes.inFocus,
-            error && classes.error
+            isInFocus && classes.inFocus,
+            isValidationError && classes.error
           )}
         >
           <input
@@ -130,14 +147,15 @@ class CustomComboBox extends React.Component {
             placeholder={
               autocomplete ? placeholderWithoutArrow : placeholderWithArrow
             }
-            onFocus={this.handleFocus}
-            onChange={this.handleInputChange}
-            onKeyDown={this.handleKeyDown}
-            value={query}
+            onFocus={this.onFocus}
+            onBlur={this.onBlur}
+            onChange={this.onInputChange}
+            // onKeyDown={this.handleKeyDown}
+            value={text}
             name={name}
           />
           {!autocomplete && (
-            <div className={classes.arrow} onClick={this.handleArrowClick}>
+            <div className={classes.arrow} onClick={this.onArrowClick}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 960 560"
@@ -149,11 +167,16 @@ class CustomComboBox extends React.Component {
               </svg>
             </div>
           )}
-          <Popover open={showPopover}>
-            <List maxHeight={autocomplete ? "auto" : 300} />
+          <Popover open={isPopoverShown}>
+            <ListConnectedToStore
+              maxHeight={autocomplete ? "auto" : 300}
+              onItemClick={this.handleItemClick}
+              onItemMouseEnter={this.handleMouseEnterItem}
+              onItemMouseLeave={this.handleMouseLeaveItem}
+            />
           </Popover>
         </div>
-        {error && (
+        {isValidationError && (
           <label className={classes.errorLabel}>Выберите значение</label>
         )}
       </div>
@@ -161,39 +184,43 @@ class CustomComboBox extends React.Component {
   }
 }
 
-const StyledComboBox = connect(
-  state => ({ ...state.combo }),
-  {
-    moveUp,
-    moveDown,
-    updateQuery,
-    blur,
-    focus,
-    closePopover,
-    loadItems,
-    select,
-    validationError,
-    highlight
-  }
-)(injectSheet(styles)(onClickOutside(CustomComboBox)));
+const StyledComboBox = injectSheet(styles)(CustomComboBox);
+const ComboBoxWithStore = connect(
+  state => {
+    const { text, isInFocus, isPopoverShown, isValidationError } = state;
+    return { text, isInFocus, isPopoverShown, isValidationError };
+  },
+  (dispatch, ownProps) => ({
+    handleFocus: () =>
+      dispatch(handleFocus(ownProps.isAutocomplete, ownProps.loadItems)),
+
+    handleBlur: () => dispatch(handleBlur()),
+
+    inputChange: event =>
+      dispatch(handleInputChange(event.target.value, ownProps.loadItems)),
+
+    handleItemClick: (event, item) => {
+      event.preventDefault();
+      dispatch(selectItem(item));
+    },
+
+    handleMouseEnterItem: (event, item) => dispatch(activateItem(item)),
+
+    handleMouseLeaveItem: (event, item) => dispatch(deactivateItem(item))
+
+    // moveUp,
+    // moveDown,
+    // select,
+  })
+)(StyledComboBox);
 
 export default class ComboBox extends React.Component {
-  constructor(props) {
-    super(props);
-    this.store = configureStore({
-      combo: { ...defaultState },
-      list: {
-        ...listReducerDefaultState,
-        getItems: props.getItems,
-        onChange: props.onChange
-      }
-    });
-  }
+  store = configureStore();
 
   render() {
     return (
       <Provider store={this.store}>
-        <StyledComboBox {...this.props} />
+        <ComboBoxWithStore {...this.props} />
       </Provider>
     );
   }

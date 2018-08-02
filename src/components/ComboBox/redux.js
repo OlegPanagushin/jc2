@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 
 export const COMBO_BOX_STORE_KEY = "COMBO_BOX_STORE_KEY";
 
-function connectComboBox(
+function connectToComboBoxProvider(
   mapStateToProps,
   mapDispatchToProps,
   mergeProps,
@@ -18,5 +18,5 @@ function connectComboBox(
   );
 }
 
-export const ComboBoxProvider = createProvider(COMBO_BOX_STORE_KEY);
-export { connectComboBox };
+export const ComboBoxStoreProvider = createProvider(COMBO_BOX_STORE_KEY);
+export { connectToComboBoxProvider };

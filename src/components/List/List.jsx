@@ -1,13 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
 import injectSheet from "react-jss";
-import { connectComboBox as connect } from "../../redux";
-import theme from "../../theme";
+import Item from "./Item";
+import Label from "./Label";
 import Spinner from "../Spinner";
-import ListItem from "../ListItem";
-import ListLabel from "../ListLabel";
-import { valueChange, loadItems, highlight, select } from "./actions";
-import { isKeyValueObject } from "../../utils";
+import Separator from "../Separator";
+import theme from "../../theme";
 
 const styles = {
   list: {
@@ -16,62 +14,90 @@ const styles = {
   }
 };
 
-class List extends React.Component {
+export class BaseList extends React.Component {
   static propTypes = {
-    classes: PropTypes.object.isRequired,
-    children: PropTypes.any,
-    handleChange: PropTypes.func
+    classes: PropTypes.shape({
+      list: PropTypes.string.isRequired
+    }).isRequired,
+    popularItems: PropTypes.array,
+    items: PropTypes.array.isRequired,
+    infoText: PropTypes.string,
+    isError: PropTypes.bool,
+    isLoading: PropTypes.bool,
+    onItemClick: PropTypes.func,
+    onItemMouseEnter: PropTypes.func,
+    onItemMouseLeave: PropTypes.func
   };
 
-  renderItem = (item, idx) =>
-    isKeyValueObject(item) ? (
-      <ListItem
-        key={`${idx}-${item.key}`}
-        onClick={item.isErroItem ? this.props.loadItems : this.props.select}
-        onHover={() => this.props.highlight(idx)}
-        highlight={idx === this.props.highlightIdx}
-      >
-        {item.value}
-      </ListItem>
-    ) : (
-      item
-    );
+  handle = name => (event, item) =>
+    this.props[name] && this.props[name]({ event, item });
 
-  renderItems = items =>
-    items.length ? (
-      items.map(this.renderItem)
-    ) : (
-      <ListLabel>На найдено</ListLabel>
-    );
+  onItemClick = this.handle("onItemClick");
+  onItemMouseEnter = this.handle("onItemMouseEnter");
+  onItemMouseLeave = this.handle("onItemMouseLeave");
 
-  renderError = () =>
-    [
-      <ListLabel key="label">
-        Что-то пошло не так, попробуйте еще раз
-      </ListLabel>,
-      { key: -1, value: "Обновить", isErroItem: true }
-    ].map(this.renderItem);
+  renderItem = item => (
+    <Item
+      key={item.key}
+      onClick={this.onItemClick}
+      onMouseEnter={this.onItemMouseEnter}
+      onMouseLeave={this.onItemMouseLeave}
+      item={item}
+      isSelected={item.isSelected}
+    >
+      {item.value}
+    </Item>
+  );
+
+  renderPopularItems = () => {
+    const { popularItems } = this.props;
+    if (!popularItems || !popularItems.length) return null;
+
+    return (
+      <React.Fragment>
+        {popularItems.map(this.renderItem)}
+        {<Separator />}
+      </React.Fragment>
+    );
+  };
+
+  renderItems = ({ items, popularItems, infoText }) => (
+    <React.Fragment>
+      {popularItems &&
+        popularItems.length &&
+        popularItems.map(this.renderItem) && <Separator />}
+      {items.length && items.map(this.renderItem)}
+      {infoText && <Label>{infoText}</Label>}
+    </React.Fragment>
+  );
+
+  renderError = () => (
+    <React.Fragment>
+      <Label>Что-то пошло не так, попробуйте еще раз</Label>
+      {this.renderItem({
+        key: -1,
+        value: "Обновить",
+        isErroItem: true,
+        isSelected: true
+      })}
+    </React.Fragment>
+  );
 
   render() {
-    const { classes, items, error, loading } = this.props;
+    const { classes, isError, isLoading } = this.props;
 
     return (
       <div className={classes.list}>
-        {loading ? (
+        {isLoading ? (
           <Spinner />
-        ) : error ? (
+        ) : isError ? (
           this.renderError()
         ) : (
-          this.renderItems(items)
+          this.renderItems(this.props)
         )}
       </div>
     );
   }
 }
 
-export default connect(
-  state => ({
-    ...state.list
-  }),
-  { valueChange, loadItems, highlight, select }
-)(injectSheet(styles)(List));
+export const StyledList = injectSheet(styles)(BaseList);

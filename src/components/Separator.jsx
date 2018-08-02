@@ -14,7 +14,9 @@ const styles = {
 const Separator = ({ classes }) => <div className={classes.separator} />;
 
 Separator.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.shape({
+    separator: PropTypes.string.isRequired
+  }).isRequired
 };
 
 export default injectSheet(styles)(Separator);

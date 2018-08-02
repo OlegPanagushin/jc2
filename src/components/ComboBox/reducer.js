@@ -1,64 +1,142 @@
 import * as consts from "./consts";
-import { VALUE_CHANGED } from "../List/consts";
 
-export const defaultState = {
-  inFocus: false,
-  showPopover: false,
+const defaultState = {
   query: "",
-  value: null,
-  error: false
+  text: "",
+  infoText: "",
+  items: null,
+  popularItems: null,
+  item: null,
+  isInFocus: false,
+  isPopoverShown: false,
+  isLoading: false,
+  isError: false,
+  isValidationError: false
 };
 
-const reducer = (state = { ...defaultState }, action) => {
-  const { type, value, isAutocomplete, query } = action;
+export default (state = { ...defaultState }, action) => {
+  const { type, item, isAutocomplete, query, items, infoText } = action;
 
   switch (type) {
-    case consts.QUERY_CHANGED:
+    case consts.HANDLE_FOCUS:
       return {
         ...state,
-        showPopover: true,
-        error: false,
-        query
+        isInFocus: true,
+        isValidationError: false,
+        isLoading: !isAutocomplete,
+        isPopoverShown: !isAutocomplete
       };
 
-    case VALUE_CHANGED:
+    case consts.HANDLE_BLUR:
       return {
         ...state,
-        value,
-        query: value ? value.value : "",
-        showPopover: false
+        isInFocus: false,
+        isPopoverShown: false
       };
 
-    case consts.FOCUS:
+    case consts.LOAD_ITEMS_REQUEST:
       return {
         ...state,
-        inFocus: true,
-        error: false,
-        showPopover: !isAutocomplete
+        isLoading: true,
+        isError: false
       };
 
-    case consts.BLUR:
+    case consts.LOAD_ITEMS_SUCCESS:
       return {
         ...state,
-        inFocus: false,
-        showPopover: false
+        isLoading: false,
+        items,
+        infoText
       };
 
-    case consts.CLOSE_POPOVER:
+    case consts.LOAD_ITEMS_FAIL:
       return {
         ...state,
-        showPopover: false
+        isLoading: false,
+        isError: true
       };
 
-    case consts.ERROR:
+    case consts.HANDLE_INPUT_CHANGE:
       return {
         ...state,
-        error: true
+        query,
+        text: query
       };
+
+    case consts.SELECT_ITEM:
+      return {
+        ...state,
+        item,
+        query: "",
+        text: item.value,
+        isPopoverShown: false
+      };
+
+    case consts.ACTIVATE_ITEM: {
+      const newItems = { ...state.items };
+      newItems.entities.items[item.key].isSelected = true;
+      return {
+        ...state,
+        items: newItems
+      };
+    }
+
+    case consts.DEACTIVATE_ITEM: {
+      const newItems = { ...state.items };
+      newItems.entities.items[item.key].isSelected = false;
+      return {
+        ...state,
+        items: newItems
+      };
+    }
+
+    // case consts.QUERY_CHANGED:
+    //   return {
+    //     ...state,
+    //     query
+    //   };
+
+    // case consts.VALUE_CHANGED:
+    //   return {
+    //     ...state,
+    //     value
+    //   };
+
+    // case consts.SELECT:
+    //   return {
+    //     ...state,
+    //     value: state.items[state.highlightIdx]
+    //   };
+
+    // case consts.QUERY_CHANGED:
+    //   return {
+    //     ...state,
+    //     showPopover: true,
+    //     error: false,
+    //     query
+    //   };
+
+    // case consts.VALUE_CHANGED:
+    //   return {
+    //     ...state,
+    //     value,
+    //     query: value ? value.value : "",
+    //     showPopover: false
+    //   };
+
+    // case consts.CLOSE_POPOVER:
+    //   return {
+    //     ...state,
+    //     showPopover: false
+    //   };
+
+    // case consts.ERROR:
+    //   return {
+    //     ...state,
+    //     error: true
+    //   };
 
     default:
       return state;
   }
 };
-
-export default reducer;

@@ -1,9 +1,8 @@
 import React from "react";
 import injectSheet from "react-jss";
+import { normalize, schema } from "normalizr";
 import { find, popular, findFrom50 } from "./service";
 import ComboBox from "./components/ComboBox";
-import ListLabel from "./components/ListLabel";
-import Separator from "./components/Separator";
 
 const styles = {
   "@global": {
@@ -13,37 +12,28 @@ const styles = {
   }
 };
 
-let mapCity = ({ Id, City }) => ({
-  key: Id,
-  value: City
+const mapCity = ({ Id, City }) => ({ key: Id, value: City });
+const normalizeCities = cities => normalize(cities, itemsSchema);
+const mapResult = result => ({
+  items: normalizeCities(result.data.map(mapCity)),
+  totalCount: result.totalCount || 0
 });
 
-let renderTotalCount = (foundCount, totalCount) =>
-  foundCount < totalCount ? (
-    <ListLabel key="label">
-      Показано {foundCount} из {totalCount} найденных городов.
-    </ListLabel>
-  ) : (
-    []
-  );
+const item = new schema.Entity(
+  "items",
+  {},
+  {
+    idAttribute: "key"
+  }
+);
+const itemsSchema = [item];
 
-const getAutocompleteItems = async query => {
-  const { data, totalCount } = await find(query),
-    items = data.map(mapCity),
-    popularItems = query.length ? [] : await popular();
+const getAutocompleteItems = query => findFrom50(query).then(mapResult);
 
-  return [].concat(
-    popularItems.map(mapCity),
-    popularItems.length ? <Separator key="separator" /> : [],
-    items,
-    renderTotalCount(items.length, totalCount)
-  );
-};
+const getDropDownItems = query => find(query).then(mapResult);
 
-const getDropDownItems = async query => {
-  const data = await findFrom50(query);
-  return data.map(mapCity);
-};
+const getPopular = query =>
+  query && query.length ? Promise.resolve([]) : popular();
 
 class App extends React.Component {
   state = {
@@ -60,14 +50,15 @@ class App extends React.Component {
         <h2>Пример работы контроля ComboBox</h2>
         <h3>Выпадающий список</h3>
         <ComboBox
-          getItems={getDropDownItems}
+          loadItems={getDropDownItems}
           onChange={this.onValueChanged}
           name="cb1"
         />
         <h3>Автокомплит</h3>
         <ComboBox
           autocomplete
-          getItems={getAutocompleteItems}
+          loadPopular={getPopular}
+          loadItems={getAutocompleteItems}
           onChange={this.onValueChanged}
           name="cb2"
         />

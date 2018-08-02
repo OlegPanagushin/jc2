@@ -34,7 +34,10 @@ const Popover = ({ classes, open, children }) => (
 );
 
 Popover.propTypes = {
-  classes: PropTypes.object.isRequired,
+  classes: PropTypes.shape({
+    popover: PropTypes.string.isRequired,
+    hide: PropTypes.string.isRequired
+  }).isRequired,
   open: PropTypes.bool,
   children: PropTypes.node
 };
