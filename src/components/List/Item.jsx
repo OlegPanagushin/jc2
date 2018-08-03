@@ -31,7 +31,7 @@ class Item extends React.Component {
       value: PropTypes.string.isRequired
     }).isRequired,
     isSelected: PropTypes.bool,
-    onClick: PropTypes.func,
+    onMouseDown: PropTypes.func,
     onMouseEnter: PropTypes.func,
     onMouseLeave: PropTypes.func
   };
@@ -43,17 +43,23 @@ class Item extends React.Component {
     this.props[name] && this.props[name](event, this.props.item);
   };
 
-  onClick = this.handle("onClick");
+  onMouseDown = this.handle("onMouseDown");
   onMouseEnter = this.handle("onMouseEnter");
   onMouseLeave = this.handle("onMouseLeave");
 
+  reveal = () =>
+    this.props.item.scrollIfNeeded &&
+    scrollIntoView(this.itemRef.current, {
+      scrollMode: "if-needed",
+      block: "start"
+    });
+
   componentDidUpdate() {
-    if (this.props.item.scrollIfNeeded) {
-      scrollIntoView(this.itemRef.current, {
-        scrollMode: "if-needed",
-        block: "start"
-      });
-    }
+    this.reveal();
+  }
+
+  componentDidMount() {
+    this.reveal();
   }
 
   render() {
@@ -62,7 +68,7 @@ class Item extends React.Component {
     return (
       <div
         className={cn(classes.item, item.isSelected && classes.highlight)}
-        onClickCapture={this.onClick}
+        onMouseDown={this.onMouseDown}
         onMouseEnter={this.onMouseEnter}
         onMouseLeave={this.onMouseLeave}
         ref={this.itemRef}

@@ -16,7 +16,8 @@ import {
   selectItem,
   activateItem,
   moveUp,
-  moveDown
+  moveDown,
+  selectActiveItem
 } from "./actions";
 import styles from "./styles";
 import Popover from "../Popover";
@@ -60,9 +61,10 @@ class CustomComboBox extends React.Component {
 
   onFocus = this.handle("handleFocus");
   onBlur = this.handle("handleBlur");
-  onInputChange = this.handle("inputChange");
   handleItemClick = this.handle("handleItemClick");
   handleMouseEnterItem = this.handle("handleMouseEnterItem");
+
+  onInputChange = event => this.props.inputChange(event);
 
   onArrowClick = () => this.inputRef.current.focus();
 
@@ -86,7 +88,7 @@ class CustomComboBox extends React.Component {
         this.props.moveDown();
         break;
       case "Enter":
-        //this.props.select(this.focusNext);
+        this.props.selectActiveItem();
         break;
       default:
         break;
@@ -169,8 +171,10 @@ const ComboBoxWithStore = connect(
 
     handleBlur: () => dispatch(handleBlur()),
 
-    inputChange: event =>
-      dispatch(handleInputChange(event.target.value, ownProps.loadItems)),
+    inputChange: (event, d) => {
+      console.log(event, d);
+      dispatch(handleInputChange(event.target.value, ownProps.loadItems));
+    },
 
     handleItemClick: (event, item) => {
       event.preventDefault();
@@ -180,7 +184,10 @@ const ComboBoxWithStore = connect(
     handleMouseEnterItem: (event, item) => dispatch(activateItem(item)),
 
     moveUp: () => dispatch(moveUp()),
-    moveDown: () => dispatch(moveDown())
+    moveDown: () => dispatch(moveDown()),
+
+    selectActiveItem: () => dispatch(selectActiveItem())
+
     // select,
   })
 )(StyledComboBox);

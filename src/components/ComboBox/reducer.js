@@ -18,6 +18,8 @@ const defaultState = {
 export default (state = { ...defaultState }, action) => {
   const { type, item, isAutocomplete, query, items, infoText } = action;
 
+  console.log(type, item);
+
   switch (type) {
     case consts.HANDLE_FOCUS:
       return {
@@ -43,7 +45,6 @@ export default (state = { ...defaultState }, action) => {
       };
 
     case consts.LOAD_ITEMS_SUCCESS:
-      if (items.length > 0) items[0].isSelected = true;
       return {
         ...state,
         isLoading: false,

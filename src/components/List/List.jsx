@@ -39,7 +39,7 @@ export class BaseList extends React.Component {
   renderItem = item => (
     <Item
       key={item.key}
-      onClick={this.onItemClick}
+      onMouseDown={this.onItemClick}
       onMouseEnter={this.onItemMouseEnter}
       onMouseLeave={this.onItemMouseLeave}
       item={item}

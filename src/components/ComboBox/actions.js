@@ -3,10 +3,18 @@ import * as consts from "./consts";
 
 const debouncedLoadItems = debounce((dispatch, getState, loadItems) => {
   const state = getState();
-  const { query } = state;
+  const { query, item } = state;
   loadItems(query)
     .then(({ items, totalCount }) => {
       const fountCount = items.length;
+      if (fountCount > 0) {
+        const idx =
+          item !== null ? items.findIndex(i => i.key === item.key) : 0;
+        if (idx > -1) {
+          items[idx].isSelected = true;
+          items[idx].scrollIfNeeded = true;
+        }
+      }
       dispatch({
         type: consts.LOAD_ITEMS_SUCCESS,
         items,
@@ -78,18 +86,36 @@ export const activateItem = item => (dispatch, getState) => {
 
 export const moveUp = () => (dispatch, getState) => {
   const state = getState();
-  dispatch({
-    type: consts.UPDATE_ITEMS,
-    items: highlightItem([...state.items], null, true, true)
-  });
+  if (state.isPopoverShown)
+    dispatch({
+      type: consts.UPDATE_ITEMS,
+      items: highlightItem([...state.items], null, true, true)
+    });
 };
 
 export const moveDown = () => (dispatch, getState) => {
   const state = getState();
-  dispatch({
-    type: consts.UPDATE_ITEMS,
-    items: highlightItem([...state.items], null, false, true)
-  });
+  if (state.isPopoverShown)
+    dispatch({
+      type: consts.UPDATE_ITEMS,
+      items: highlightItem([...state.items], null, false, true)
+    });
+};
+
+export const selectActiveItem = () => (dispatch, getState) => {
+  const state = getState();
+  if (!state.isPopoverShown) return;
+
+  if (state.items.length === 0) {
+    dispatch({
+      type: consts.VALIDATION_ERROR
+    });
+    return;
+  }
+  const item = state.items.find(item => item.isSelected === true);
+  if (item) item.scrollIfNeeded = true;
+
+  dispatch(selectItem(item));
 };
 
 // export const moveUp = () => (dispatch, getState) => {
