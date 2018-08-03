@@ -6,7 +6,7 @@ const debouncedLoadItems = debounce((dispatch, getState, loadItems) => {
   const { query } = state;
   loadItems(query)
     .then(({ items, totalCount }) => {
-      const fountCount = items.result.length;
+      const fountCount = items.length;
       dispatch({
         type: consts.LOAD_ITEMS_SUCCESS,
         items,
@@ -46,15 +46,51 @@ export const selectItem = item => ({
   item
 });
 
-export const activateItem = item => ({
-  type: consts.ACTIVATE_ITEM,
-  item
-});
+const highlightItem = (
+  allItems,
+  key = null,
+  up = false,
+  scrollIfNeeded = false
+) => {
+  const currentItemIdx = allItems.findIndex(item => item.isSelected === true),
+    maxIdx = allItems.length - 1;
 
-export const deactivateItem = item => ({
-  type: consts.DEACTIVATE_ITEM,
-  item
-});
+  let newItemIdx = currentItemIdx;
+  if (key !== null) newItemIdx = allItems.findIndex(item => item.key === key);
+  else {
+    if (up) newItemIdx = currentItemIdx === 0 ? maxIdx : currentItemIdx - 1;
+    else newItemIdx = currentItemIdx === maxIdx ? 0 : currentItemIdx + 1;
+  }
+  allItems[currentItemIdx].isSelected = false;
+  allItems[currentItemIdx].scrollIfNeeded = false;
+  allItems[newItemIdx].isSelected = true;
+  allItems[newItemIdx].scrollIfNeeded = scrollIfNeeded;
+  return allItems;
+};
+
+export const activateItem = item => (dispatch, getState) => {
+  const state = getState();
+  dispatch({
+    type: consts.UPDATE_ITEMS,
+    items: highlightItem([...state.items], item.key)
+  });
+};
+
+export const moveUp = () => (dispatch, getState) => {
+  const state = getState();
+  dispatch({
+    type: consts.UPDATE_ITEMS,
+    items: highlightItem([...state.items], null, true, true)
+  });
+};
+
+export const moveDown = () => (dispatch, getState) => {
+  const state = getState();
+  dispatch({
+    type: consts.UPDATE_ITEMS,
+    items: highlightItem([...state.items], null, false, true)
+  });
+};
 
 // export const moveUp = () => (dispatch, getState) => {
 //   const state = getState();

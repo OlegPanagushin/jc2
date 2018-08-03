@@ -5,7 +5,6 @@
   "dependencies": {
     "classnames": "^2.2.6",
     "lodash.debounce": "^4.0.8",
-    "normalizr": "^3.2.4",
     "polished": "^1.9.3",
     "prop-types": "^15.6.2",
     "react": "^16.4.1",

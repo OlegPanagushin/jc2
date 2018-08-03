@@ -11,8 +11,7 @@ const styles = {
     fontFamily: theme.fontFamily,
     fontSize: theme.fontSize,
     lineHeight: theme.lineHeight,
-    padding: [[theme.spacingUnit / 2, theme.spacingUnit]],
-    transition: theme.transition(["background", "color"], 100)
+    padding: [[theme.spacingUnit / 2, theme.spacingUnit]]
   },
   highlight: {
     background: theme.borderColorFocus,
@@ -48,8 +47,8 @@ class Item extends React.Component {
   onMouseEnter = this.handle("onMouseEnter");
   onMouseLeave = this.handle("onMouseLeave");
 
-  componentDidUpdate(prevProps) {
-    if (this.props.highlight !== prevProps.highlight) {
+  componentDidUpdate() {
+    if (this.props.item.scrollIfNeeded) {
       scrollIntoView(this.itemRef.current, {
         scrollMode: "if-needed",
         block: "start"
@@ -58,12 +57,12 @@ class Item extends React.Component {
   }
 
   render() {
-    const { classes, children, isSelected } = this.props;
+    const { classes, children, item } = this.props;
 
     return (
       <div
-        className={cn(classes.item, isSelected && classes.highlight)}
-        onClick={this.onClick}
+        className={cn(classes.item, item.isSelected && classes.highlight)}
+        onClickCapture={this.onClick}
         onMouseEnter={this.onMouseEnter}
         onMouseLeave={this.onMouseLeave}
         ref={this.itemRef}

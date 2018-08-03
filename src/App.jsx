@@ -1,6 +1,5 @@
 import React from "react";
 import injectSheet from "react-jss";
-import { normalize, schema } from "normalizr";
 import { find, popular, findFrom50 } from "./service";
 import ComboBox from "./components/ComboBox";
 
@@ -13,24 +12,14 @@ const styles = {
 };
 
 const mapCity = ({ Id, City }) => ({ key: Id, value: City });
-const normalizeCities = cities => normalize(cities, itemsSchema);
 const mapResult = result => ({
-  items: normalizeCities(result.data.map(mapCity)),
+  items: result.data.map(mapCity),
   totalCount: result.totalCount || 0
 });
 
-const item = new schema.Entity(
-  "items",
-  {},
-  {
-    idAttribute: "key"
-  }
-);
-const itemsSchema = [item];
+const getAutocompleteItems = query => find(query).then(mapResult);
 
-const getAutocompleteItems = query => findFrom50(query).then(mapResult);
-
-const getDropDownItems = query => find(query).then(mapResult);
+const getDropDownItems = query => findFrom50(query).then(mapResult);
 
 const getPopular = query =>
   query && query.length ? Promise.resolve([]) : popular();

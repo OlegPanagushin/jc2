@@ -4,7 +4,6 @@ import cn from "classnames";
 import injectSheet from "react-jss";
 import { createStore, applyMiddleware } from "redux";
 import thunk from "redux-thunk";
-import { denormalize, schema } from "normalizr";
 import {
   ComboBoxStoreProvider as Provider,
   connectToComboBoxProvider as connect
@@ -16,17 +15,8 @@ import {
   handleInputChange,
   selectItem,
   activateItem,
-  deactivateItem
-  // blur,
-  // focus,
-  // closePopover,
-  // validationError,
-  // moveUp,
-  // moveDown,
-  // loadItems,
-  // updateQuery,
-  // select,
-  // highlight
+  moveUp,
+  moveDown
 } from "./actions";
 import styles from "./styles";
 import Popover from "../Popover";
@@ -39,26 +29,11 @@ const configureStore = initialState =>
 const placeholderWithArrow = "Введите или выберите из списка";
 const placeholderWithoutArrow = "Начните вводить";
 
-const keyValue = new schema.Entity(
-  "items",
-  {},
-  {
-    idAttribute: "key"
-  }
-);
-const keyValueSchema = [keyValue];
-
-const getItems = normalData => {
-  return normalData
-    ? denormalize(normalData.result, keyValueSchema, normalData.entities)
-    : [];
-};
-
 const ListConnectedToStore = connect(state => {
   const { items, popularItems, infoText, isError, isLoading } = state;
   return {
-    items: getItems(items),
-    popularItems: getItems(popularItems),
+    items,
+    popularItems,
     infoText,
     isError,
     isLoading
@@ -88,7 +63,6 @@ class CustomComboBox extends React.Component {
   onInputChange = this.handle("inputChange");
   handleItemClick = this.handle("handleItemClick");
   handleMouseEnterItem = this.handle("handleMouseEnterItem");
-  handleMouseLeaveItem = this.handle("handleMouseLeaveItem");
 
   onArrowClick = () => this.inputRef.current.focus();
 
@@ -97,13 +71,13 @@ class CustomComboBox extends React.Component {
     this.props.blur();
   };
 
-  handleKeyDown = e => {
-    switch (e.key) {
+  handleKeyDown = event => {
+    switch (event.key) {
       case "Tab":
-        this.props.select(null);
+        ///this.props.select(null);
         break;
       case "Escape":
-        this.props.closePopover();
+        this.onBlur({ event });
         break;
       case "ArrowUp":
         this.props.moveUp();
@@ -112,7 +86,7 @@ class CustomComboBox extends React.Component {
         this.props.moveDown();
         break;
       case "Enter":
-        this.props.select(this.focusNext);
+        //this.props.select(this.focusNext);
         break;
       default:
         break;
@@ -150,7 +124,7 @@ class CustomComboBox extends React.Component {
             onFocus={this.onFocus}
             onBlur={this.onBlur}
             onChange={this.onInputChange}
-            // onKeyDown={this.handleKeyDown}
+            onKeyDown={this.handleKeyDown}
             value={text}
             name={name}
           />
@@ -172,7 +146,6 @@ class CustomComboBox extends React.Component {
               maxHeight={autocomplete ? "auto" : 300}
               onItemClick={this.handleItemClick}
               onItemMouseEnter={this.handleMouseEnterItem}
-              onItemMouseLeave={this.handleMouseLeaveItem}
             />
           </Popover>
         </div>
@@ -206,10 +179,8 @@ const ComboBoxWithStore = connect(
 
     handleMouseEnterItem: (event, item) => dispatch(activateItem(item)),
 
-    handleMouseLeaveItem: (event, item) => dispatch(deactivateItem(item))
-
-    // moveUp,
-    // moveDown,
+    moveUp: () => dispatch(moveUp()),
+    moveDown: () => dispatch(moveDown())
     // select,
   })
 )(StyledComboBox);

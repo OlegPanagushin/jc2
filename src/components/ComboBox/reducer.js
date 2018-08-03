@@ -4,9 +4,10 @@ const defaultState = {
   query: "",
   text: "",
   infoText: "",
-  items: null,
-  popularItems: null,
+  items: [],
+  popularItems: [],
   item: null,
+  itemInFocus: null,
   isInFocus: false,
   isPopoverShown: false,
   isLoading: false,
@@ -42,6 +43,7 @@ export default (state = { ...defaultState }, action) => {
       };
 
     case consts.LOAD_ITEMS_SUCCESS:
+      if (items.length > 0) items[0].isSelected = true;
       return {
         ...state,
         isLoading: false,
@@ -72,23 +74,11 @@ export default (state = { ...defaultState }, action) => {
         isPopoverShown: false
       };
 
-    case consts.ACTIVATE_ITEM: {
-      const newItems = { ...state.items };
-      newItems.entities.items[item.key].isSelected = true;
+    case consts.UPDATE_ITEMS:
       return {
         ...state,
-        items: newItems
+        items
       };
-    }
-
-    case consts.DEACTIVATE_ITEM: {
-      const newItems = { ...state.items };
-      newItems.entities.items[item.key].isSelected = false;
-      return {
-        ...state,
-        items: newItems
-      };
-    }
 
     // case consts.QUERY_CHANGED:
     //   return {

@@ -50,8 +50,8 @@ export class BaseList extends React.Component {
   );
 
   renderPopularItems = () => {
-    const { popularItems } = this.props;
-    if (!popularItems || !popularItems.length) return null;
+    const { popularItems = [] } = this.props;
+    if (popularItems.length === 0) return null;
 
     return (
       <React.Fragment>
@@ -61,12 +61,11 @@ export class BaseList extends React.Component {
     );
   };
 
-  renderItems = ({ items, popularItems, infoText }) => (
+  renderItems = ({ items, popularItems = [], infoText }) => (
     <React.Fragment>
-      {popularItems &&
-        popularItems.length &&
+      {popularItems.length > 0 &&
         popularItems.map(this.renderItem) && <Separator />}
-      {items.length && items.map(this.renderItem)}
+      {items.length > 0 && items.map(this.renderItem)}
       {infoText && <Label>{infoText}</Label>}
     </React.Fragment>
   );

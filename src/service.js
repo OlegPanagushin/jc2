@@ -34,9 +34,10 @@ export async function popular() {
 export async function findFrom50(query) {
   let source = data.slice(0, 50);
   if (typeof query === "string") {
-    return source.filter(v =>
+    const result = source.filter(v =>
       v.City.toLowerCase().includes(query.toString().toLowerCase())
     );
-  } else if (!query) return source;
+    return { data: result, totalCount: result.length };
+  } else if (!query) return { source, totalCount: source.length };
   else throw Error("Wrong query");
 }
