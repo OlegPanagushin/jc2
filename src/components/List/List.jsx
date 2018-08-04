@@ -70,10 +70,10 @@ export class BaseList extends React.Component {
     </React.Fragment>
   );
 
-  renderError = () => (
+  renderError = ({ items }) => (
     <React.Fragment>
       <Label>Что-то пошло не так, попробуйте еще раз</Label>
-      {this.renderItems({ items: this.props.items })}
+      {this.renderItems({ items })}
     </React.Fragment>
   );
 
@@ -85,7 +85,7 @@ export class BaseList extends React.Component {
         {isLoading ? (
           <Spinner />
         ) : isError ? (
-          this.renderError()
+          this.renderError(this.props)
         ) : (
           this.renderItems(this.props)
         )}

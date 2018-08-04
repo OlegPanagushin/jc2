@@ -13,7 +13,6 @@ import {
   handleFocus,
   handleBlur,
   handleInputChange,
-  selectItem,
   activateItem,
   moveUp,
   moveDown,
@@ -164,16 +163,17 @@ const ComboBoxWithStore = connect(
   },
   (dispatch, ownProps) => ({
     handleFocus: () =>
-      dispatch(handleFocus(ownProps.isAutocomplete, ownProps.loadItems)),
+      dispatch(handleFocus(ownProps.autocomplete, ownProps.loadItems)),
 
     handleBlur: () => dispatch(handleBlur()),
 
     inputChange: event =>
       dispatch(handleInputChange(event.target.value, ownProps.loadItems)),
 
-    handleItemClick: (event, item) => {
+    handleItemClick: (event /*, item*/) => {
       event.preventDefault();
-      dispatch(selectItem(item));
+      //dispatch(selectItem(item));
+      dispatch(selectActiveItem(ownProps.loadItems));
     },
 
     handleMouseEnterItem: (event, item) => dispatch(activateItem(item)),
@@ -182,7 +182,7 @@ const ComboBoxWithStore = connect(
     moveDown: () => dispatch(moveDown()),
 
     selectActiveItem: successCallback =>
-      dispatch(selectActiveItem(successCallback))
+      dispatch(selectActiveItem(ownProps.loadItems, successCallback))
   })
 )(StyledComboBox);
 

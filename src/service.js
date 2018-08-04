@@ -14,8 +14,7 @@ let randomDelay = () =>
 export async function find(query, take = 5, page = 0, errorIsPossible = true) {
   await randomDelay();
 
-  if (errorIsPossible && random(0, 30) > 25)
-    throw Error("Something went wrong");
+  if (errorIsPossible && random(0, 30) > 5) throw Error("Something went wrong");
 
   if (typeof query === "string") {
     const result = data.filter(v =>

@@ -18,7 +18,7 @@ const defaultState = {
 export default (state = { ...defaultState }, action) => {
   const { type, item, isAutocomplete, query, items, infoText } = action;
 
-  console.log(type, item);
+  console.log(type, action);
 
   switch (type) {
     case consts.HANDLE_FOCUS:
@@ -48,6 +48,7 @@ export default (state = { ...defaultState }, action) => {
       return {
         ...state,
         isLoading: false,
+        isError: false,
         items,
         infoText
       };
@@ -56,7 +57,8 @@ export default (state = { ...defaultState }, action) => {
       return {
         ...state,
         isLoading: false,
-        isError: true
+        isError: true,
+        items
       };
 
     case consts.HANDLE_INPUT_CHANGE:
@@ -83,51 +85,11 @@ export default (state = { ...defaultState }, action) => {
         items
       };
 
-    // case consts.QUERY_CHANGED:
-    //   return {
-    //     ...state,
-    //     query
-    //   };
-
-    // case consts.VALUE_CHANGED:
-    //   return {
-    //     ...state,
-    //     value
-    //   };
-
-    // case consts.SELECT:
-    //   return {
-    //     ...state,
-    //     value: state.items[state.highlightIdx]
-    //   };
-
-    // case consts.QUERY_CHANGED:
-    //   return {
-    //     ...state,
-    //     showPopover: true,
-    //     error: false,
-    //     query
-    //   };
-
-    // case consts.VALUE_CHANGED:
-    //   return {
-    //     ...state,
-    //     value,
-    //     query: value ? value.value : "",
-    //     showPopover: false
-    //   };
-
-    // case consts.CLOSE_POPOVER:
-    //   return {
-    //     ...state,
-    //     showPopover: false
-    //   };
-
-    // case consts.ERROR:
-    //   return {
-    //     ...state,
-    //     error: true
-    //   };
+    case consts.VALIDATION_ERROR:
+      return {
+        ...state,
+        isValidationError: true
+      };
 
     default:
       return state;

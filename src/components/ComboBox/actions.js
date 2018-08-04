@@ -1,7 +1,15 @@
 import debounce from "lodash.debounce";
 import * as consts from "./consts";
 
-const debouncedLoadItems = debounce((dispatch, getState, loadItems) => {
+const errorItemKey = "";
+const errorItem = {
+  key: errorItemKey,
+  value: "Обновить",
+  isErroItem: true,
+  isSelected: true
+};
+
+const loadItemsFunction = (dispatch, getState, loadItems) => {
   const state = getState();
   const { query, item } = state;
   loadItems(query)
@@ -34,17 +42,11 @@ const debouncedLoadItems = debounce((dispatch, getState, loadItems) => {
       dispatch({
         type: consts.LOAD_ITEMS_FAIL,
         error,
-        items: [
-          {
-            key: -1,
-            value: "Обновить",
-            isErroItem: true,
-            isSelected: true
-          }
-        ]
+        items: [errorItem]
       })
     );
-}, 300);
+};
+const debouncedLoadItems = debounce(loadItemsFunction, 300);
 
 export const handleFocus = (isAutocomplete, loadItems) => (
   dispatch,
@@ -55,7 +57,7 @@ export const handleFocus = (isAutocomplete, loadItems) => (
     isAutocomplete
   });
 
-  debouncedLoadItems(dispatch, getState, loadItems);
+  if (!isAutocomplete) debouncedLoadItems(dispatch, getState, loadItems);
 };
 
 export const handleBlur = () => ({ type: consts.HANDLE_BLUR });
@@ -121,18 +123,26 @@ export const moveDown = () => (dispatch, getState) => {
     });
 };
 
-export const selectActiveItem = () => (dispatch, getState) => {
+export const selectActiveItem = (loadItems, succesCallback) => (
+  dispatch,
+  getState
+) => {
   const state = getState();
-  if (!state.isPopoverShown) return;
+  if (!state.isPopoverShown || state.isLoading) return;
 
   if (state.items.length === 0) {
     dispatch({
       type: consts.VALIDATION_ERROR
     });
     return;
+  } else if (state.items[0].key === errorItemKey) {
+    loadItemsFunction(dispatch, getState, loadItems);
+    return;
   }
+
   const item = state.items.find(item => item.isSelected === true);
   if (item) item.scrollIfNeeded = true;
 
   dispatch(selectItem(item));
+  succesCallback && succesCallback();
 };
