@@ -63,7 +63,9 @@ export default (state = { ...defaultState }, action) => {
       return {
         ...state,
         query,
-        text: query
+        text: query,
+        isLoading: true,
+        isPopoverShown: true
       };
 
     case consts.SELECT_ITEM:

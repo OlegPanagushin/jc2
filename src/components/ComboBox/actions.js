@@ -7,6 +7,9 @@ const debouncedLoadItems = debounce((dispatch, getState, loadItems) => {
   loadItems(query)
     .then(({ items, totalCount }) => {
       const fountCount = items.length;
+      let foundItems = [];
+      let infoText = "";
+
       if (fountCount > 0) {
         const idx =
           item !== null ? items.findIndex(i => i.key === item.key) : 0;
@@ -14,17 +17,33 @@ const debouncedLoadItems = debounce((dispatch, getState, loadItems) => {
           items[idx].isSelected = true;
           items[idx].scrollIfNeeded = true;
         }
-      }
-      dispatch({
-        type: consts.LOAD_ITEMS_SUCCESS,
-        items,
-        infoText:
+        foundItems = items;
+        infoText =
           fountCount === totalCount
             ? ""
-            : `Показано ${fountCount} из ${totalCount} найденных городов.`
+            : `Показано ${fountCount} из ${totalCount} найденных городов.`;
+      } else infoText = "Не найдено";
+
+      dispatch({
+        type: consts.LOAD_ITEMS_SUCCESS,
+        items: foundItems,
+        infoText: infoText
       });
     })
-    .catch(error => dispatch({ type: consts.LOAD_ITEMS_FAIL, error }));
+    .catch(error =>
+      dispatch({
+        type: consts.LOAD_ITEMS_FAIL,
+        error,
+        items: [
+          {
+            key: -1,
+            value: "Обновить",
+            isErroItem: true,
+            isSelected: true
+          }
+        ]
+      })
+    );
 }, 300);
 
 export const handleFocus = (isAutocomplete, loadItems) => (
@@ -117,75 +136,3 @@ export const selectActiveItem = () => (dispatch, getState) => {
 
   dispatch(selectItem(item));
 };
-
-// export const moveUp = () => (dispatch, getState) => {
-//   const state = getState();
-//   const { items, highlightIdx } = state.list;
-//   const count = items.length;
-//   let newIndex = highlightIdx;
-//   for (let i = 0; i < count; i++) {
-//     newIndex--;
-//     newIndex = newIndex >= 0 ? newIndex : count - 1;
-//     if (isKeyValueObject(items[newIndex])) break;
-
-//     if (i === count - 1) newIndex = highlightIdx;
-//   }
-
-//   // dispatch({
-//   //   type: consts.HIGHLIGHT,
-//   //   highlightIdx: -1
-//   // });
-//   dispatch(highlight(newIndex));
-// };
-
-// export const moveDown = () => (dispatch, getState) => {
-//   const state = getState();
-//   const { items, highlightIdx } = state.list;
-//   const count = items.length;
-//   let newIndex = highlightIdx;
-//   for (let i = 0; i < count; i++) {
-//     newIndex++;
-//     newIndex = newIndex < count ? newIndex : 0;
-//     if (isKeyValueObject(items[newIndex])) break;
-
-//     if (i === count - 1) newIndex = highlightIdx;
-//   }
-
-//   // dispatch({
-//   //   type: consts.HIGHLIGHT,
-//   //   highlightIdx: -1
-//   // });
-//   dispatch(highlight(newIndex));
-// };
-
-// export const valueChange = value => (dispatch, getState) => {
-//   dispatch({ type: consts.VALUE_CHANGED, value });
-//   const state = getState();
-//   const { onChange } = state.list;
-//   if (onChange) onChange(value);
-// };
-
-// export const select = (success, fail) => (dispatch, getState) => {
-//   const state = getState();
-//   const { items, highlightIdx, isLoading, error } = state.list;
-
-//   if (isLoading) return;
-
-//   if (error) dispatch(loadItems(dispatch, getState));
-//   else if (!items.length) {
-//     if (fail) fail();
-//     return;
-//   } else {
-//     const newValue = items[highlightIdx];
-//     valueChange(newValue)(dispatch, getState);
-//     if (success) success();
-//   }
-// };
-
-// export const updateQuery = query => (dispatch, getState) => {
-//   dispatch({ type: consts.QUERY_CHANGED, query });
-//   loadItems()(dispatch, getState);
-// };
-
-// export const selectItem = item => ({ type: "", item });
-// export const unselectItem = item => ({ type: "", item });

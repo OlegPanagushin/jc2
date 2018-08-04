@@ -11,7 +11,7 @@ const popularCities = [
 let randomDelay = () =>
   new Promise(resolve => setTimeout(resolve, random(200, 800)));
 
-export async function find(query, take = 5, page = 0, errorIsPossible = false) {
+export async function find(query, take = 5, page = 0, errorIsPossible = true) {
   await randomDelay();
 
   if (errorIsPossible && random(0, 30) > 25)

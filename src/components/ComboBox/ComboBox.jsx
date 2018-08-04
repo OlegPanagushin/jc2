@@ -68,15 +68,10 @@ class CustomComboBox extends React.Component {
 
   onArrowClick = () => this.inputRef.current.focus();
 
-  focusNext = () => {
-    focusNextControl(this.inputRef.current);
-    this.props.blur();
-  };
-
   handleKeyDown = event => {
     switch (event.key) {
       case "Tab":
-        ///this.props.select(null);
+        this.props.selectActiveItem();
         break;
       case "Escape":
         this.onBlur({ event });
@@ -88,7 +83,9 @@ class CustomComboBox extends React.Component {
         this.props.moveDown();
         break;
       case "Enter":
-        this.props.selectActiveItem();
+        this.props.selectActiveItem(() =>
+          focusNextControl(this.inputRef.current)
+        );
         break;
       default:
         break;
@@ -171,10 +168,8 @@ const ComboBoxWithStore = connect(
 
     handleBlur: () => dispatch(handleBlur()),
 
-    inputChange: (event, d) => {
-      console.log(event, d);
-      dispatch(handleInputChange(event.target.value, ownProps.loadItems));
-    },
+    inputChange: event =>
+      dispatch(handleInputChange(event.target.value, ownProps.loadItems)),
 
     handleItemClick: (event, item) => {
       event.preventDefault();
@@ -186,9 +181,8 @@ const ComboBoxWithStore = connect(
     moveUp: () => dispatch(moveUp()),
     moveDown: () => dispatch(moveDown()),
 
-    selectActiveItem: () => dispatch(selectActiveItem())
-
-    // select,
+    selectActiveItem: successCallback =>
+      dispatch(selectActiveItem(successCallback))
   })
 )(StyledComboBox);
 

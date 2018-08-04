@@ -73,12 +73,7 @@ export class BaseList extends React.Component {
   renderError = () => (
     <React.Fragment>
       <Label>Что-то пошло не так, попробуйте еще раз</Label>
-      {this.renderItem({
-        key: -1,
-        value: "Обновить",
-        isErroItem: true,
-        isSelected: true
-      })}
+      {this.renderItems({ items: this.props.items })}
     </React.Fragment>
   );
 
