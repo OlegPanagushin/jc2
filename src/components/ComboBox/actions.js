@@ -36,17 +36,28 @@ const loadItemsFunction = (dispatch, getState, handlers) => {
             : `Показано ${fountCount} из ${totalCount} найденных городов.`;
       } else infoText = "Не найдено";
 
-      dispatch({
+      const result = {
         type: consts.LOAD_ITEMS_SUCCESS,
         items: foundItems,
-        infoText: infoText
-      });
+        infoText: infoText,
+        popularItems: []
+      };
+
+      if (loadPopular) {
+        loadPopular(query)
+          .then(popularItems => {
+            result.popularItems = popularItems;
+            dispatch(result);
+          })
+          .catch(() => dispatch(result));
+      } else dispatch(result);
     })
     .catch(error =>
       dispatch({
         type: consts.LOAD_ITEMS_FAIL,
         error,
-        items: [errorItem]
+        items: [errorItem],
+        popularItems: []
       })
     );
 };

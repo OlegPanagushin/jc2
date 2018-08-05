@@ -202,6 +202,10 @@ const ComboBoxWithStore = connect(
   }
 )(StyledComboBox);
 
+/*
+  Не самая лучша идея создавать свой стор на каждый комбобокс.
+  Лучше в редьюсере вести отдельные наборы данных по всем комбобоксам тогда стор можно будет использовать любой
+*/
 export default class ComboBox extends React.Component {
   store = configureStore();
 

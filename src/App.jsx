@@ -1,6 +1,6 @@
 import React from "react";
 import injectSheet from "react-jss";
-import { find, popular, findFrom50 } from "./service";
+import { find, /*popular,*/ findFrom50 } from "./service";
 import ComboBox from "./components/ComboBox";
 
 const styles = {
@@ -17,12 +17,17 @@ const mapResult = result => ({
   totalCount: result.totalCount || 0
 });
 
-const getAutocompleteItems = query => find(query).then(mapResult);
-
 const getDropDownItems = query => findFrom50(query).then(mapResult);
 
-const getPopular = query =>
-  query && query.length ? Promise.resolve([]) : popular();
+const getAutocompleteItems = query => find(query).then(mapResult);
+
+const getAutocompleteItemsWithError = query =>
+  find(query, 5, 0, true).then(mapResult);
+
+// const getPopular = query =>
+//   query && query.length
+//     ? Promise.resolve([])
+//     : popular().then(items => items.map(mapCity));
 
 class App extends React.Component {
   state = {
@@ -47,8 +52,16 @@ class App extends React.Component {
         <h3>Автокомплит</h3>
         <ComboBox
           autocomplete
-          loadPopular={getPopular}
+          //loadPopular={getPopular}
           loadItems={getAutocompleteItems}
+          onValueChange={this.onValueChanged}
+          name="cb2"
+          value={value}
+        />
+        <h3>Автокомплит c возможной ошибкой</h3>
+        <ComboBox
+          autocomplete
+          loadItems={getAutocompleteItemsWithError}
           onValueChange={this.onValueChanged}
           name="cb2"
           value={value}

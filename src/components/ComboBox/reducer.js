@@ -16,9 +16,17 @@ const defaultState = {
 };
 
 export default (state = { ...defaultState }, action) => {
-  const { type, item, isAutocomplete, query, items, infoText } = action;
+  const {
+    type,
+    item,
+    isAutocomplete,
+    query,
+    items,
+    infoText,
+    popularItems
+  } = action;
 
-  console.log(type, action);
+  //console.log(type, action);
 
   switch (type) {
     case consts.HANDLE_FOCUS:
@@ -50,6 +58,7 @@ export default (state = { ...defaultState }, action) => {
         isLoading: false,
         isError: false,
         items,
+        popularItems,
         infoText
       };
 
