@@ -16,7 +16,9 @@ import {
   activateItem,
   moveUp,
   moveDown,
-  selectActiveItem
+  selectActiveItem,
+  closePopover,
+  selectItem
 } from "./actions";
 import styles from "./styles";
 import Popover from "../Popover";
@@ -73,7 +75,7 @@ class CustomComboBox extends React.Component {
         this.props.selectActiveItem();
         break;
       case "Escape":
-        this.onBlur({ event });
+        this.props.closePopover();
         break;
       case "ArrowUp":
         this.props.moveUp();
@@ -90,6 +92,13 @@ class CustomComboBox extends React.Component {
         break;
     }
   };
+
+  componentDidUpdate(prevProps) {
+    //хорошо бы еще чукнуть, что это за велью пришло
+    if (this.props.value !== prevProps.value) {
+      this.props.itemSetOutside(this.props.value);
+    }
+  }
 
   render() {
     const {
@@ -161,29 +170,36 @@ const ComboBoxWithStore = connect(
     const { text, isInFocus, isPopoverShown, isValidationError } = state;
     return { text, isInFocus, isPopoverShown, isValidationError };
   },
-  (dispatch, ownProps) => ({
-    handleFocus: () =>
-      dispatch(handleFocus(ownProps.autocomplete, ownProps.loadItems)),
+  (dispatch, ownProps) => {
+    const { loadItems, loadPopular, onValueChange } = ownProps;
+    const handlers = { loadItems, loadPopular, onValueChange };
 
-    handleBlur: () => dispatch(handleBlur()),
+    return {
+      handleFocus: () => dispatch(handleFocus(ownProps.autocomplete, handlers)),
 
-    inputChange: event =>
-      dispatch(handleInputChange(event.target.value, ownProps.loadItems)),
+      handleBlur: () => dispatch(handleBlur(handlers, true)),
 
-    handleItemClick: (event /*, item*/) => {
-      event.preventDefault();
-      //dispatch(selectItem(item));
-      dispatch(selectActiveItem(ownProps.loadItems));
-    },
+      inputChange: event =>
+        dispatch(handleInputChange(event.target.value, handlers)),
 
-    handleMouseEnterItem: (event, item) => dispatch(activateItem(item)),
+      handleItemClick: event => {
+        event.preventDefault();
+        dispatch(selectActiveItem(handlers));
+      },
 
-    moveUp: () => dispatch(moveUp()),
-    moveDown: () => dispatch(moveDown()),
+      handleMouseEnterItem: (event, item) => dispatch(activateItem(item)),
 
-    selectActiveItem: successCallback =>
-      dispatch(selectActiveItem(ownProps.loadItems, successCallback))
-  })
+      moveUp: () => dispatch(moveUp()),
+      moveDown: () => dispatch(moveDown()),
+
+      selectActiveItem: successCallback =>
+        dispatch(selectActiveItem(handlers, successCallback)),
+
+      closePopover: () => dispatch(closePopover()),
+
+      itemSetOutside: item => dispatch(selectItem(item))
+    };
+  }
 )(StyledComboBox);
 
 export default class ComboBox extends React.Component {

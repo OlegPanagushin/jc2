@@ -18,7 +18,7 @@ const defaultState = {
 export default (state = { ...defaultState }, action) => {
   const { type, item, isAutocomplete, query, items, infoText } = action;
 
-  //console.log(type, action);
+  console.log(type, action);
 
   switch (type) {
     case consts.HANDLE_FOCUS:
@@ -75,7 +75,7 @@ export default (state = { ...defaultState }, action) => {
         ...state,
         item,
         query: "",
-        text: item.value,
+        text: item ? item.value : "",
         isPopoverShown: false
       };
 
@@ -90,6 +90,12 @@ export default (state = { ...defaultState }, action) => {
         ...state,
         isValidationError: true,
         item: null
+      };
+
+    case consts.CLOSE_POPOVER:
+      return {
+        ...state,
+        isPopoverShown: false
       };
 
     default:

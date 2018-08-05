@@ -9,9 +9,10 @@ const errorItem = {
   isSelected: true
 };
 
-const loadItemsFunction = (dispatch, getState, loadItems) => {
+const loadItemsFunction = (dispatch, getState, handlers) => {
   const state = getState();
   const { query, item } = state;
+  const { loadItems, loadPopular } = handlers;
   dispatch({
     type: consts.LOAD_ITEMS_REQUEST
   });
@@ -51,7 +52,7 @@ const loadItemsFunction = (dispatch, getState, loadItems) => {
 };
 const debouncedLoadItems = debounce(loadItemsFunction, 300);
 
-export const handleFocus = (isAutocomplete, loadItems) => (
+export const handleFocus = (isAutocomplete, handlers) => (
   dispatch,
   getState
 ) => {
@@ -60,27 +61,21 @@ export const handleFocus = (isAutocomplete, loadItems) => (
     isAutocomplete
   });
 
-  if (!isAutocomplete) debouncedLoadItems(dispatch, getState, loadItems);
+  if (!isAutocomplete) debouncedLoadItems(dispatch, getState, handlers);
 };
 
-export const handleBlur = () => (dispatch, getState) => {
-  //validate
+export const handleBlur = (handlers, shoulSelectActiveItem) => dispatch => {
+  if (shoulSelectActiveItem) dispatch(selectActiveItem(handlers));
+
   dispatch({ type: consts.HANDLE_BLUR });
-
-  const state = getState();
-  const { items, query } = state;
-  if (query !== "" && items.length === 0)
-    dispatch({
-      type: consts.VALIDATION_ERROR
-    });
 };
 
-export const handleInputChange = (query, loadItems) => (dispatch, getState) => {
+export const handleInputChange = (query, handlers) => (dispatch, getState) => {
   dispatch({
     type: consts.HANDLE_INPUT_CHANGE,
     query
   });
-  debouncedLoadItems(dispatch, getState, loadItems);
+  debouncedLoadItems(dispatch, getState, handlers);
 };
 
 export const selectItem = item => ({
@@ -103,10 +98,16 @@ const highlightItem = (
     if (up) newItemIdx = currentItemIdx === 0 ? maxIdx : currentItemIdx - 1;
     else newItemIdx = currentItemIdx === maxIdx ? 0 : currentItemIdx + 1;
   }
-  allItems[currentItemIdx].isSelected = false;
-  allItems[currentItemIdx].scrollIfNeeded = false;
-  allItems[newItemIdx].isSelected = true;
-  allItems[newItemIdx].scrollIfNeeded = scrollIfNeeded;
+  let i = allItems[currentItemIdx];
+  if (i) {
+    i.isSelected = false;
+    i.scrollIfNeeded = false;
+  }
+  i = allItems[newItemIdx];
+  if (i) {
+    i.isSelected = true;
+    i.scrollIfNeeded = scrollIfNeeded;
+  }
   return allItems;
 };
 
@@ -136,7 +137,7 @@ export const moveDown = () => (dispatch, getState) => {
     });
 };
 
-export const selectActiveItem = (loadItems, succesCallback) => (
+export const selectActiveItem = (handlers, succesCallback) => (
   dispatch,
   getState
 ) => {
@@ -149,7 +150,7 @@ export const selectActiveItem = (loadItems, succesCallback) => (
     });
     return;
   } else if (state.items[0].key === errorItemKey) {
-    loadItemsFunction(dispatch, getState, loadItems);
+    loadItemsFunction(dispatch, getState, handlers);
     return;
   }
 
@@ -158,4 +159,7 @@ export const selectActiveItem = (loadItems, succesCallback) => (
 
   dispatch(selectItem(item));
   succesCallback && succesCallback();
+  handlers.onValueChange && handlers.onValueChange(item);
 };
+
+export const closePopover = () => ({ type: consts.CLOSE_POPOVER });

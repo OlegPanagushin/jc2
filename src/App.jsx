@@ -40,16 +40,18 @@ class App extends React.Component {
         <h3>Выпадающий список</h3>
         <ComboBox
           loadItems={getDropDownItems}
-          onChange={this.onValueChanged}
+          onValueChange={this.onValueChanged}
           name="cb1"
+          value={value}
         />
         <h3>Автокомплит</h3>
         <ComboBox
           autocomplete
           loadPopular={getPopular}
           loadItems={getAutocompleteItems}
-          onChange={this.onValueChanged}
+          onValueChange={this.onValueChanged}
           name="cb2"
+          value={value}
         />
         <br />
         <br />
