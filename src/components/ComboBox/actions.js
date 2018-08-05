@@ -12,6 +12,9 @@ const errorItem = {
 const loadItemsFunction = (dispatch, getState, loadItems) => {
   const state = getState();
   const { query, item } = state;
+  dispatch({
+    type: consts.LOAD_ITEMS_REQUEST
+  });
   loadItems(query)
     .then(({ items, totalCount }) => {
       const fountCount = items.length;
@@ -60,7 +63,17 @@ export const handleFocus = (isAutocomplete, loadItems) => (
   if (!isAutocomplete) debouncedLoadItems(dispatch, getState, loadItems);
 };
 
-export const handleBlur = () => ({ type: consts.HANDLE_BLUR });
+export const handleBlur = () => (dispatch, getState) => {
+  //validate
+  dispatch({ type: consts.HANDLE_BLUR });
+
+  const state = getState();
+  const { items, query } = state;
+  if (query !== "" && items.length === 0)
+    dispatch({
+      type: consts.VALIDATION_ERROR
+    });
+};
 
 export const handleInputChange = (query, loadItems) => (dispatch, getState) => {
   dispatch({

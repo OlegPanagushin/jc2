@@ -18,7 +18,7 @@ const defaultState = {
 export default (state = { ...defaultState }, action) => {
   const { type, item, isAutocomplete, query, items, infoText } = action;
 
-  console.log(type, action);
+  //console.log(type, action);
 
   switch (type) {
     case consts.HANDLE_FOCUS:
@@ -88,7 +88,8 @@ export default (state = { ...defaultState }, action) => {
     case consts.VALIDATION_ERROR:
       return {
         ...state,
-        isValidationError: true
+        isValidationError: true,
+        item: null
       };
 
     default:
