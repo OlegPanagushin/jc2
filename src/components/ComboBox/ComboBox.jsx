@@ -28,8 +28,8 @@ import { focusNextControl } from "../../utils";
 const configureStore = initialState =>
   createStore(reducer, initialState, applyMiddleware(thunk));
 
-const placeholderWithArrow = "Введите или выберите из списка";
-const placeholderWithoutArrow = "Начните вводить";
+const placeholderWithArrow = "Select from list";
+const placeholderWithoutArrow = "Start type";
 
 const ListConnectedToStore = connect(state => {
   const { items, popularItems, infoText, isError, isLoading } = state;
@@ -94,7 +94,6 @@ class CustomComboBox extends React.Component {
   };
 
   componentDidUpdate(prevProps) {
-    //хорошо бы еще чукнуть, что это за велью пришло
     if (this.props.value !== prevProps.value) {
       this.props.itemSetOutside(this.props.value);
     }
@@ -202,10 +201,6 @@ const ComboBoxWithStore = connect(
   }
 )(StyledComboBox);
 
-/*
-  Не самая лучша идея создавать свой стор на каждый комбобокс.
-  Лучше в редьюсере вести отдельные наборы данных по всем комбобоксам тогда стор можно будет использовать любой
-*/
 export default class ComboBox extends React.Component {
   store = configureStore();
 

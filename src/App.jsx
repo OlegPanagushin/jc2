@@ -11,9 +11,9 @@ const styles = {
   }
 };
 
-const mapCity = ({ Id, City }) => ({ key: Id, value: City });
+const map = ({ Id, Name }) => ({ key: Id, value: Name });
 const mapResult = result => ({
-  items: result.data.map(mapCity),
+  items: result.data.map(map),
   totalCount: result.totalCount || 0
 });
 
@@ -27,7 +27,7 @@ const getAutocompleteItemsWithError = query =>
 // const getPopular = query =>
 //   query && query.length
 //     ? Promise.resolve([])
-//     : popular().then(items => items.map(mapCity));
+//     : popular().then(items => items.map(map));
 
 class App extends React.Component {
   state = {
@@ -41,15 +41,15 @@ class App extends React.Component {
 
     return (
       <div className="App">
-        <h2>Пример работы контроля ComboBox</h2>
-        <h3>Выпадающий список</h3>
+        <h2>Examlples</h2>
+        <h3>Dropdown list</h3>
         <ComboBox
           loadItems={getDropDownItems}
           onValueChange={this.onValueChanged}
           name="cb1"
           value={value}
         />
-        <h3>Автокомплит</h3>
+        <h3>Autocomlete</h3>
         <ComboBox
           autocomplete
           //loadPopular={getPopular}
@@ -58,7 +58,7 @@ class App extends React.Component {
           name="cb2"
           value={value}
         />
-        <h3>Автокомплит c возможной ошибкой</h3>
+        <h3>Autocomlete and something can goes wrong</h3>
         <ComboBox
           autocomplete
           loadItems={getAutocompleteItemsWithError}
@@ -69,7 +69,7 @@ class App extends React.Component {
         <br />
         <br />
         <br />
-        <label>Выбранное значение: {value && value.value}</label>
+        <label>Selected value: {value && value.value}</label>
       </div>
     );
   }

@@ -38,7 +38,7 @@ export class BaseList extends React.Component {
 
   renderItem = item => (
     <Item
-      key={item.key}
+      key={Item.key}
       onMouseDown={this.onItemClick}
       onMouseEnter={this.onItemMouseEnter}
       onMouseLeave={this.onItemMouseLeave}
@@ -60,7 +60,7 @@ export class BaseList extends React.Component {
 
   renderError = ({ items }) => (
     <React.Fragment>
-      <Label>Что-то пошло не так, попробуйте еще раз</Label>
+      <Label>Something went wrong, try again</Label>
       {this.renderItems({ items })}
     </React.Fragment>
   );

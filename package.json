@@ -5,21 +5,27 @@
   "dependencies": {
     "classnames": "^2.2.6",
     "lodash.debounce": "^4.0.8",
-    "polished": "^1.9.3",
-    "prop-types": "^15.6.2",
-    "react": "^16.4.1",
-    "react-dom": "^16.4.1",
+    "polished": "^3.0.3",
+    "prop-types": "^15.7.2",
+    "react": "^16.8.4",
+    "react-dom": "^16.8.4",
     "react-jss": "^8.6.1",
     "react-redux": "^5.0.7",
-    "react-scripts": "1.1.4",
-    "redux": "^4.0.0",
+    "react-scripts": "2.1.8",
+    "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
-    "scroll-into-view-if-needed": "^2.2.16"
+    "scroll-into-view-if-needed": "^2.2.20"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
-  }
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }

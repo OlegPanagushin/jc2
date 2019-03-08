@@ -4,7 +4,7 @@ import * as consts from "./consts";
 const errorItemKey = "";
 const errorItem = {
   key: errorItemKey,
-  value: "Обновить",
+  value: "Refresh",
   isErroItem: true,
   isSelected: true
 };
@@ -33,8 +33,8 @@ const loadItemsFunction = (dispatch, getState, handlers) => {
         infoText =
           fountCount === totalCount
             ? ""
-            : `Показано ${fountCount} из ${totalCount} найденных городов.`;
-      } else infoText = "Не найдено";
+            : `Shown ${fountCount} of ${totalCount} found.`;
+      } else infoText = "Not found";
 
       const result = {
         type: consts.LOAD_ITEMS_SUCCESS,
